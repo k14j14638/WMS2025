@@ -350,8 +350,9 @@ async function initializeSampleOutbound() {
 // 設置導航
 function setupNavigation() {
     const navLinks = document.querySelectorAll('nav a');
-    const sections = document.querySelectorAll('section');
+    const sections = document.querySelectorAll('section.page');
     
+    // 處理導航點擊
     navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
@@ -366,10 +367,15 @@ function setupNavigation() {
             const targetSection = document.getElementById(targetId);
             if (targetSection) {
                 targetSection.style.display = 'block';
+                // 更新 URL hash
+                window.location.hash = targetId;
+                
+                // 更新活動狀態
+                navLinks.forEach(navLink => {
+                    navLink.classList.remove('active');
+                });
+                link.classList.add('active');
             }
-            
-            // 更新 URL hash
-            window.location.hash = targetId;
         });
     });
     
@@ -378,6 +384,12 @@ function setupNavigation() {
     sections.forEach(section => {
         section.style.display = section.id === initialHash ? 'block' : 'none';
     });
+    
+    // 設置初始活動狀態
+    const initialLink = document.querySelector(`nav a[href="#${initialHash}"]`);
+    if (initialLink) {
+        initialLink.classList.add('active');
+    }
 }
 
 // 顯示指定頁面

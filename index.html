@@ -122,9 +122,9 @@
             </section>
 
             <!-- 報表頁面 -->
-            <div id="reports-page" class="page">
-                <div class="page-header">
-                    <h2>報表</h2>
+            <section id="reports" class="page">
+                <h2>報表</h2>
+                <div class="action-bar">
                     <button id="export-excel-btn" class="btn primary">匯出EXCEL</button>
                 </div>
                 <div class="card">
@@ -135,7 +135,7 @@
                     <h3>出入庫趨勢</h3>
                     <canvas id="trend-chart"></canvas>
                 </div>
-            </div>
+            </section>
         </main>
     </div>
 
@@ -178,7 +178,7 @@
                 </div>
                 <div class="form-actions">
                     <button type="submit" class="btn btn-primary">新增</button>
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('addProductModal')">取消</button>
+                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('addProductModal').style.display='none'">取消</button>
                 </div>
             </form>
         </div>
@@ -203,7 +203,7 @@
                 </div>
                 <div class="form-actions">
                     <button type="submit" class="btn btn-primary">新增</button>
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('addInboundModal')">取消</button>
+                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('addInboundModal').style.display='none'">取消</button>
                 </div>
             </form>
         </div>
@@ -228,7 +228,7 @@
                 </div>
                 <div class="form-actions">
                     <button type="submit" class="btn btn-primary">新增</button>
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('addOutboundModal')">取消</button>
+                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('addOutboundModal').style.display='none'">取消</button>
                 </div>
             </form>
         </div>
