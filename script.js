@@ -57,7 +57,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.log('開始測試數據庫連接...');
     const isConnected = await testDatabaseConnection();
     if (isConnected) {
-        alert('數據庫連接測試成功！請查看控制台獲取詳細信息。');
+        console.log('數據庫連接成功，開始初始化示例數據...');
+        await initializeSampleProducts();
+        await updateDashboard();
+        await updateProductsTable();
+        await updateInventoryTable();
+        alert('系統初始化完成！請查看控制台獲取詳細信息。');
     } else {
         alert('數據庫連接測試失敗！請查看控制台獲取錯誤信息。');
     }
@@ -101,6 +106,56 @@ async function initializeData() {
         }
     } catch (error) {
         console.error('初始化數據時出錯:', error);
+    }
+}
+
+// 初始化示例商品數據
+async function initializeSampleProducts() {
+    try {
+        const productsSnapshot = await db.collection(PRODUCTS).get();
+        if (productsSnapshot.empty) {
+            const sampleProducts = [
+                {
+                    id: 'P001',
+                    name: '筆記型電腦',
+                    specification: '15.6吋, 16GB RAM, 512GB SSD',
+                    stock: 50,
+                    minStock: 10
+                },
+                {
+                    id: 'P002',
+                    name: '無線滑鼠',
+                    specification: '藍牙5.0, 可充電',
+                    stock: 100,
+                    minStock: 20
+                },
+                {
+                    id: 'P003',
+                    name: '機械鍵盤',
+                    specification: 'RGB背光, 青軸',
+                    stock: 30,
+                    minStock: 5
+                },
+                {
+                    id: 'P004',
+                    name: '顯示器',
+                    specification: '27吋, 4K解析度',
+                    stock: 25,
+                    minStock: 5
+                }
+            ];
+
+            // 批量添加示例數據
+            const batch = db.batch();
+            sampleProducts.forEach(product => {
+                const docRef = db.collection(PRODUCTS).doc(product.id);
+                batch.set(docRef, product);
+            });
+            await batch.commit();
+            console.log('示例商品數據初始化成功！');
+        }
+    } catch (error) {
+        console.error('初始化示例商品數據時出錯:', error);
     }
 }
 
