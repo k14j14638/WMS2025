@@ -637,69 +637,72 @@ async function deleteProduct(id) {
 
 // 入庫操作
 async function addInbound() {
-    try {
-        const productsSnapshot = await db.collection(PRODUCTS).get();
-        const products = productsSnapshot.docs.map(doc => doc.data());
-        const productOptions = products.map(p => 
-            `<option value="${p.id}">${p.name}</option>`
-        ).join('');
+    const modalBody = document.getElementById('modal-body');
+    modalBody.innerHTML = `
+        <h3>新增入庫</h3>
+        <form id="add-inbound-form">
+            <div class="form-group">
+                <label for="inbound-product">商品</label>
+                <select id="inbound-product" required>
+                    <option value="">請選擇商品</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="inbound-quantity">數量</label>
+                <input type="number" id="inbound-quantity" required min="1">
+            </div>
+            <div class="form-group">
+                <label for="inbound-operator">操作者</label>
+                <input type="text" id="inbound-operator" required>
+            </div>
+            <button type="submit" class="btn primary">保存</button>
+        </form>
+    `;
+    
+    document.getElementById('modal').style.display = 'block';
+    
+    // 載入商品選項
+    loadProductOptions('inbound-product');
+    
+    document.getElementById('add-inbound-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
         
-        const content = `
-            <h2>新增入庫</h2>
-            <form id="add-inbound-form">
-                <div class="form-group">
-                    <label for="inbound-product">商品</label>
-                    <select id="inbound-product" required>
-                        ${productOptions}
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="inbound-quantity">數量</label>
-                    <input type="number" id="inbound-quantity" required min="1">
-                </div>
-                <button type="submit" class="btn primary">保存</button>
-            </form>
-        `;
-        showModal(content);
+        const productId = document.getElementById('inbound-product').value;
+        const quantity = parseInt(document.getElementById('inbound-quantity').value);
+        const operator = document.getElementById('inbound-operator').value;
         
-        document.getElementById('add-inbound-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            try {
-                const productId = document.getElementById('inbound-product').value;
-                const quantity = parseInt(document.getElementById('inbound-quantity').value);
-                const product = products.find(p => p.id === productId);
-                
-                const inbound = {
-                    id: Date.now().toString(),
-                    productId: productId,
-                    productName: product.name,
-                    quantity: quantity,
-                    date: new Date().toISOString().split('T')[0]
-                };
-                
-                await db.collection(INBOUND).add(inbound);
-                
-                // 更新商品庫存
-                const productDoc = await db.collection(PRODUCTS).where('id', '==', productId).get();
-                const currentProduct = productDoc.docs[0].data();
-                await db.collection(PRODUCTS).doc(productDoc.docs[0].id).update({
-                    stock: currentProduct.stock + quantity
-                });
-                
-                closeModal();
-                updateInboundTable();
-                updateProductsTable();
-                updateInventoryTable();
-                updateDashboard();
-            } catch (error) {
-                console.error('添加入庫記錄時出錯：', error);
-                alert('添加入庫記錄失敗，請重試');
-            }
-        });
-    } catch (error) {
-        console.error('獲取商品列表時出錯：', error);
-        alert('獲取商品列表失敗，請重試');
-    }
+        try {
+            // 獲取商品信息
+            const productDoc = await db.collection(PRODUCTS).where('id', '==', productId).get();
+            const product = productDoc.docs[0].data();
+            
+            // 創建入庫記錄
+            const inbound = {
+                id: `IN${Date.now()}`,
+                productId: product.id,
+                productName: product.name,
+                quantity: quantity,
+                date: new Date().toISOString().split('T')[0],
+                operator: operator
+            };
+            
+            // 添加到入庫集合
+            await db.collection(INBOUND).doc(inbound.id).set(inbound);
+            
+            // 更新商品庫存
+            await db.collection(PRODUCTS).doc(productDoc.docs[0].id).update({
+                stock: product.stock + quantity
+            });
+            
+            closeModal();
+            updateInboundTable();
+            updateDashboard();
+            alert('入庫成功！');
+        } catch (error) {
+            console.error('新增入庫時出錯:', error);
+            alert('入庫失敗，請稍後再試');
+        }
+    });
 }
 
 async function deleteInbound(id) {
@@ -731,74 +734,78 @@ async function deleteInbound(id) {
 
 // 出庫操作
 async function addOutbound() {
-    try {
-        const productsSnapshot = await db.collection(PRODUCTS).get();
-        const products = productsSnapshot.docs.map(doc => doc.data());
-        const productOptions = products.map(p => 
-            `<option value="${p.id}">${p.name}</option>`
-        ).join('');
+    const modalBody = document.getElementById('modal-body');
+    modalBody.innerHTML = `
+        <h3>新增出庫</h3>
+        <form id="add-outbound-form">
+            <div class="form-group">
+                <label for="outbound-product">商品</label>
+                <select id="outbound-product" required>
+                    <option value="">請選擇商品</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="outbound-quantity">數量</label>
+                <input type="number" id="outbound-quantity" required min="1">
+            </div>
+            <div class="form-group">
+                <label for="outbound-operator">操作者</label>
+                <input type="text" id="outbound-operator" required>
+            </div>
+            <button type="submit" class="btn primary">保存</button>
+        </form>
+    `;
+    
+    document.getElementById('modal').style.display = 'block';
+    
+    // 載入商品選項
+    loadProductOptions('outbound-product');
+    
+    document.getElementById('add-outbound-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
         
-        const content = `
-            <h2>新增出庫</h2>
-            <form id="add-outbound-form">
-                <div class="form-group">
-                    <label for="outbound-product">商品</label>
-                    <select id="outbound-product" required>
-                        ${productOptions}
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="outbound-quantity">數量</label>
-                    <input type="number" id="outbound-quantity" required min="1">
-                </div>
-                <button type="submit" class="btn primary">保存</button>
-            </form>
-        `;
-        showModal(content);
+        const productId = document.getElementById('outbound-product').value;
+        const quantity = parseInt(document.getElementById('outbound-quantity').value);
+        const operator = document.getElementById('outbound-operator').value;
         
-        document.getElementById('add-outbound-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            try {
-                const productId = document.getElementById('outbound-product').value;
-                const quantity = parseInt(document.getElementById('outbound-quantity').value);
-                const product = products.find(p => p.id === productId);
-                
-                if (product.stock < quantity) {
-                    alert('庫存不足！');
-                    return;
-                }
-                
-                const outbound = {
-                    id: Date.now().toString(),
-                    productId: productId,
-                    productName: product.name,
-                    quantity: quantity,
-                    date: new Date().toISOString().split('T')[0]
-                };
-                
-                await db.collection(OUTBOUND).add(outbound);
-                
-                // 更新商品庫存
-                const productDoc = await db.collection(PRODUCTS).where('id', '==', productId).get();
-                const currentProduct = productDoc.docs[0].data();
-                await db.collection(PRODUCTS).doc(productDoc.docs[0].id).update({
-                    stock: currentProduct.stock - quantity
-                });
-                
-                closeModal();
-                updateOutboundTable();
-                updateProductsTable();
-                updateInventoryTable();
-                updateDashboard();
-            } catch (error) {
-                console.error('添加出庫記錄時出錯：', error);
-                alert('添加出庫記錄失敗，請重試');
+        try {
+            // 獲取商品信息
+            const productDoc = await db.collection(PRODUCTS).where('id', '==', productId).get();
+            const product = productDoc.docs[0].data();
+            
+            // 檢查庫存
+            if (product.stock < quantity) {
+                alert('庫存不足！');
+                return;
             }
-        });
-    } catch (error) {
-        console.error('獲取商品列表時出錯：', error);
-        alert('獲取商品列表失敗，請重試');
-    }
+            
+            // 創建出庫記錄
+            const outbound = {
+                id: `OUT${Date.now()}`,
+                productId: product.id,
+                productName: product.name,
+                quantity: quantity,
+                date: new Date().toISOString().split('T')[0],
+                operator: operator
+            };
+            
+            // 添加到出庫集合
+            await db.collection(OUTBOUND).doc(outbound.id).set(outbound);
+            
+            // 更新商品庫存
+            await db.collection(PRODUCTS).doc(productDoc.docs[0].id).update({
+                stock: product.stock - quantity
+            });
+            
+            closeModal();
+            updateOutboundTable();
+            updateDashboard();
+            alert('出庫成功！');
+        } catch (error) {
+            console.error('新增出庫時出錯:', error);
+            alert('出庫失敗，請稍後再試');
+        }
+    });
 }
 
 async function deleteOutbound(id) {
@@ -1123,24 +1130,173 @@ async function updateReportsPage() {
     }
 }
 
-// 初始化
+// 載入商品選項
+async function loadProductOptions(selectId) {
+    try {
+        const select = document.getElementById(selectId);
+        const productsSnapshot = await db.collection(PRODUCTS).get();
+        
+        productsSnapshot.forEach(doc => {
+            const product = doc.data();
+            const option = document.createElement('option');
+            option.value = product.id;
+            option.textContent = `${product.name} (${product.id})`;
+            select.appendChild(option);
+        });
+    } catch (error) {
+        console.error('載入商品選項時出錯:', error);
+    }
+}
+
+// 更新庫存圖表
+async function updateInventoryChart() {
+    try {
+        const productsSnapshot = await db.collection(PRODUCTS).get();
+        const ctx = document.getElementById('inventory-chart').getContext('2d');
+        
+        const labels = [];
+        const stockData = [];
+        const minStockData = [];
+        
+        productsSnapshot.forEach(doc => {
+            const product = doc.data();
+            labels.push(product.name);
+            stockData.push(product.stock);
+            minStockData.push(product.minStock);
+        });
+        
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: '當前庫存',
+                        data: stockData,
+                        backgroundColor: 'rgba(155, 133, 121, 0.5)',
+                        borderColor: 'rgba(155, 133, 121, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: '最低庫存',
+                        data: minStockData,
+                        backgroundColor: 'rgba(107, 143, 113, 0.5)',
+                        borderColor: 'rgba(107, 143, 113, 1)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    } catch (error) {
+        console.error('更新庫存圖表時出錯:', error);
+    }
+}
+
+// 更新趨勢圖表
+async function updateTrendChart() {
+    try {
+        const inboundSnapshot = await db.collection(INBOUND).get();
+        const outboundSnapshot = await db.collection(OUTBOUND).get();
+        
+        const dates = new Set();
+        const inboundData = {};
+        const outboundData = {};
+        
+        // 收集所有日期
+        inboundSnapshot.forEach(doc => {
+            const data = doc.data();
+            dates.add(data.date);
+            inboundData[data.date] = (inboundData[data.date] || 0) + data.quantity;
+        });
+        
+        outboundSnapshot.forEach(doc => {
+            const data = doc.data();
+            dates.add(data.date);
+            outboundData[data.date] = (outboundData[data.date] || 0) + data.quantity;
+        });
+        
+        // 轉換為數組並排序
+        const sortedDates = Array.from(dates).sort();
+        
+        const ctx = document.getElementById('trend-chart').getContext('2d');
+        
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: sortedDates,
+                datasets: [
+                    {
+                        label: '入庫數量',
+                        data: sortedDates.map(date => inboundData[date] || 0),
+                        borderColor: 'rgba(155, 133, 121, 1)',
+                        backgroundColor: 'rgba(155, 133, 121, 0.1)',
+                        fill: true
+                    },
+                    {
+                        label: '出庫數量',
+                        data: sortedDates.map(date => outboundData[date] || 0),
+                        borderColor: 'rgba(107, 143, 113, 1)',
+                        backgroundColor: 'rgba(107, 143, 113, 0.1)',
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    } catch (error) {
+        console.error('更新趨勢圖表時出錯:', error);
+    }
+}
+
+// 設置事件監聽器
 document.addEventListener('DOMContentLoaded', () => {
-    initializeData();
-    setupNavigation();
+    // 測試數據庫連接
+    testDatabaseConnection();
     
-    // 設置按鈕事件
-    document.getElementById('add-product-btn').addEventListener('click', addProduct);
-    document.getElementById('add-inbound-btn').addEventListener('click', addInbound);
-    document.getElementById('add-outbound-btn').addEventListener('click', addOutbound);
+    // 設置導航
+    setupNavigation();
     
     // 設置模態框關閉按鈕
     document.querySelector('.close').addEventListener('click', closeModal);
     
     // 新增商品按鈕
-    document.getElementById('add-inventory-btn').addEventListener('click', addInventory);
+    const addInventoryBtn = document.getElementById('add-inventory-btn');
+    if (addInventoryBtn) {
+        addInventoryBtn.addEventListener('click', addInventory);
+    }
+    
+    // 新增入庫按鈕
+    const addInboundBtn = document.getElementById('add-inbound-btn');
+    if (addInboundBtn) {
+        addInboundBtn.addEventListener('click', addInbound);
+    }
+    
+    // 新增出庫按鈕
+    const addOutboundBtn = document.getElementById('add-outbound-btn');
+    if (addOutboundBtn) {
+        addOutboundBtn.addEventListener('click', addOutbound);
+    }
     
     // 匯出 Excel 按鈕
-    document.getElementById('export-excel-btn').addEventListener('click', exportToExcel);
+    const exportExcelBtn = document.getElementById('export-excel-btn');
+    if (exportExcelBtn) {
+        exportExcelBtn.addEventListener('click', exportToExcel);
+    }
     
     // 初始化儀表板
     updateDashboard();
