@@ -110,6 +110,15 @@ function setupNavigation() {
     // 監聽 hash 變化
     window.addEventListener('hashchange', handleNavigation);
     
+    // 阻止導航鏈接的默認行為
+    document.querySelectorAll('nav a').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const pageId = link.getAttribute('href').substring(1);
+            window.location.hash = pageId;
+        });
+    });
+    
     // 初始加載時處理導航
     handleNavigation();
 }
