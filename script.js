@@ -63,6 +63,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // 然後初始化示例數據
         await initializeSampleProducts();
         await initializeSampleInbound();
+        await initializeSampleOutbound();
         await updateDashboard();
         await updateProductsTable();
         await updateInventoryTable();
@@ -119,112 +120,133 @@ async function initializeData() {
 // 初始化示例商品數據
 async function initializeSampleProducts() {
     try {
-        const productsSnapshot = await db.collection(PRODUCTS).get();
-        if (productsSnapshot.empty) {
-            const sampleProducts = [
-                {
-                    id: 'P001',
-                    name: '筆記型電腦',
-                    specification: '15.6吋, 16GB RAM, 512GB SSD',
-                    stock: 50,
-                    minStock: 10
-                },
-                {
-                    id: 'P002',
-                    name: '無線滑鼠',
-                    specification: '藍牙5.0, 可充電',
-                    stock: 100,
-                    minStock: 20
-                },
-                {
-                    id: 'P003',
-                    name: '機械鍵盤',
-                    specification: 'RGB背光, 青軸',
-                    stock: 30,
-                    minStock: 5
-                },
-                {
-                    id: 'P004',
-                    name: '顯示器',
-                    specification: '27吋, 4K解析度',
-                    stock: 25,
-                    minStock: 5
-                }
-            ];
+        console.log('開始添加示例商品...');
+        const products = [
+            {
+                id: 'P001',
+                name: '筆記型電腦',
+                stock: 10,
+                location: 'A區-01',
+                category: '電子產品'
+            },
+            {
+                id: 'P002',
+                name: '無線滑鼠',
+                stock: 20,
+                location: 'A區-02',
+                category: '電子配件'
+            },
+            {
+                id: 'P003',
+                name: '機械鍵盤',
+                stock: 15,
+                location: 'A區-03',
+                category: '電子配件'
+            },
+            {
+                id: 'P004',
+                name: '顯示器',
+                stock: 8,
+                location: 'B區-01',
+                category: '電子產品'
+            }
+        ];
 
-            // 批量添加示例數據
-            const batch = db.batch();
-            sampleProducts.forEach(product => {
-                const docRef = db.collection(PRODUCTS).doc(product.id);
-                batch.set(docRef, product);
-            });
-            await batch.commit();
-            console.log('示例商品數據初始化成功！');
-        }
+        const batch = db.batch();
+        products.forEach(product => {
+            const docRef = db.collection(PRODUCTS).doc(product.id);
+            batch.set(docRef, product);
+        });
+        await batch.commit();
+        console.log('示例商品初始化成功！');
     } catch (error) {
-        console.error('初始化示例商品數據時出錯:', error);
+        console.error('初始化示例商品時出錯:', error);
+        throw error;
     }
 }
 
 // 初始化示例入庫記錄
 async function initializeSampleInbound() {
     try {
-        const inboundSnapshot = await db.collection(INBOUND).get();
-        if (inboundSnapshot.empty) {
-            console.log('開始添加示例入庫記錄...');
-            const today = new Date().toISOString().split('T')[0];
-            const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-            
-            const sampleInbound = [
-                {
-                    id: 'IN001',
-                    productId: 'P001',
-                    productName: '筆記型電腦',
-                    quantity: 10,
-                    date: today,
-                    operator: '系統管理員'
-                },
-                {
-                    id: 'IN002',
-                    productId: 'P002',
-                    productName: '無線滑鼠',
-                    quantity: 20,
-                    date: today,
-                    operator: '系統管理員'
-                },
-                {
-                    id: 'IN003',
-                    productId: 'P003',
-                    productName: '機械鍵盤',
-                    quantity: 5,
-                    date: yesterday,
-                    operator: '系統管理員'
-                }
-            ];
+        console.log('開始添加示例入庫記錄...');
+        const today = new Date();
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
 
-            // 批量添加示例數據
-            const batch = db.batch();
-            sampleInbound.forEach(record => {
-                const docRef = db.collection(INBOUND).doc(record.id);
-                batch.set(docRef, record);
-            });
-            await batch.commit();
-            console.log('示例入庫記錄初始化成功！');
-
-            // 更新商品庫存
-            for (const record of sampleInbound) {
-                const productDoc = await db.collection(PRODUCTS).where('id', '==', record.productId).get();
-                if (!productDoc.empty) {
-                    const currentProduct = productDoc.docs[0].data();
-                    await db.collection(PRODUCTS).doc(productDoc.docs[0].id).update({
-                        stock: currentProduct.stock + record.quantity
-                    });
-                }
+        const inboundRecords = [
+            {
+                productId: 'P001',
+                quantity: 5,
+                date: today.toISOString().split('T')[0]
+            },
+            {
+                productId: 'P002',
+                quantity: 10,
+                date: today.toISOString().split('T')[0]
+            },
+            {
+                productId: 'P003',
+                quantity: 8,
+                date: yesterday.toISOString().split('T')[0]
             }
-            console.log('商品庫存更新完成！');
+        ];
+
+        const batch = db.batch();
+        inboundRecords.forEach(record => {
+            const docRef = db.collection(INBOUND).doc(record.id);
+            batch.set(docRef, record);
+        });
+        await batch.commit();
+        console.log('示例入庫記錄初始化成功！');
+
+        // 更新商品庫存
+        for (const record of inboundRecords) {
+            await updateProductStock(record.productId, record.quantity);
         }
+        console.log('商品庫存更新完成！');
     } catch (error) {
         console.error('初始化示例入庫記錄時出錯:', error);
+        throw error;
+    }
+}
+
+// 初始化示例出庫記錄
+async function initializeSampleOutbound() {
+    try {
+        console.log('開始添加示例出庫記錄...');
+        const today = new Date();
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+
+        const outboundRecords = [
+            {
+                productId: 'P001',
+                quantity: 2,
+                date: today.toISOString().split('T')[0]
+            },
+            {
+                productId: 'P002',
+                quantity: 5,
+                date: yesterday.toISOString().split('T')[0]
+            }
+        ];
+
+        const batch = db.batch();
+        outboundRecords.forEach(record => {
+            const docRef = db.collection(OUTBOUND).doc(record.id);
+            batch.set(docRef, record);
+        });
+        await batch.commit();
+        console.log('示例出庫記錄初始化成功！');
+
+        // 更新商品庫存
+        for (const record of outboundRecords) {
+            await updateProductStock(record.productId, -record.quantity);
+        }
+        console.log('商品庫存更新完成！');
+    } catch (error) {
+        console.error('初始化示例出庫記錄時出錯:', error);
+        throw error;
     }
 }
 
@@ -316,28 +338,38 @@ async function updateDashboard() {
 // 更新商品表格
 async function updateProductsTable() {
     try {
+        const productsTable = document.getElementById('productsTable');
+        if (!productsTable) {
+            console.log('找不到商品表格元素');
+            return;
+        }
+
         const productsSnapshot = await db.collection(PRODUCTS).get();
-        const tbody = document.querySelector('#products-table tbody');
+        const tbody = productsTable.querySelector('tbody');
+        if (!tbody) {
+            console.log('找不到商品表格的 tbody 元素');
+            return;
+        }
+
         tbody.innerHTML = '';
-        
         productsSnapshot.forEach(doc => {
-            const product = doc.data();
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${product.id}</td>
-                <td>${product.name}</td>
-                <td>${product.specification}</td>
-                <td>${product.stock}</td>
-                <td>${product.minStock}</td>
+            const data = doc.data();
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${data.id}</td>
+                <td>${data.name}</td>
+                <td>${data.stock}</td>
+                <td>${data.location}</td>
+                <td>${data.category}</td>
                 <td>
-                    <button class="btn primary" onclick="editProduct('${product.id}')">編輯</button>
-                    <button class="btn danger" onclick="deleteProduct('${product.id}')">刪除</button>
+                    <button class="btn btn-secondary" onclick="editProduct('${doc.id}')">編輯</button>
+                    <button class="btn btn-danger" onclick="deleteProduct('${doc.id}')">刪除</button>
                 </td>
             `;
-            tbody.appendChild(tr);
+            tbody.appendChild(row);
         });
     } catch (error) {
-        console.error('更新商品表格時出錯：', error);
+        console.error('更新商品表格時出錯:', error);
     }
 }
 
@@ -1405,14 +1437,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         await updateAutocompleteOptions();
 
         // 更新頁面顯示
-        updateInventoryTable();
-        updateInboundTable();
-        updateOutboundTable();
-        updateDashboard();
-        updateReportCharts();
+        await updateProductsTable();
+        await updateInboundTable();
+        await updateOutboundTable();
+        await updateDashboard();
+        await updateReportCharts();
 
         // 設置按鈕事件監聽器
         setupButtonListeners();
+
+        console.log('系統初始化完成！');
     } catch (error) {
         console.error('初始化時發生錯誤:', error);
         alert('初始化失敗，請檢查控制台獲取詳細信息');
