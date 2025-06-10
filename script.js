@@ -165,6 +165,32 @@ async function initializeSampleProducts() {
     }
 }
 
+// 更新商品庫存
+async function updateProductStock(productId, quantity) {
+    try {
+        // 查找商品
+        const productsSnapshot = await db.collection(PRODUCTS).where('id', '==', productId).get();
+        if (productsSnapshot.empty) {
+            console.error('找不到商品:', productId);
+            return;
+        }
+
+        const productDoc = productsSnapshot.docs[0];
+        const currentStock = productDoc.data().stock;
+        const newStock = currentStock + quantity;
+
+        // 更新庫存
+        await db.collection(PRODUCTS).doc(productDoc.id).update({
+            stock: newStock
+        });
+
+        console.log(`商品 ${productId} 庫存已更新: ${currentStock} -> ${newStock}`);
+    } catch (error) {
+        console.error('更新商品庫存時出錯:', error);
+        throw error;
+    }
+}
+
 // 初始化示例入庫記錄
 async function initializeSampleInbound() {
     try {
