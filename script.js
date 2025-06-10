@@ -9,8 +9,13 @@ const firebaseConfig = {
 };
 
 // 初始化 Firebase
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+try {
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    console.log('Firebase 初始化成功');
+} catch (error) {
+    console.error('Firebase 初始化失敗:', error);
+}
 
 // 頁面導航
 function showPage(pageId) {
