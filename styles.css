@@ -1,17 +1,17 @@
 /* 全局樣式 */
 :root {
-    /* 主色調 - 使用柔和的米色和灰褐色 */
-    --primary-color: #E6D5C7;      /* 柔和的米色 */
-    --secondary-color: #8B7355;    /* 溫暖的灰褐色 */
-    --background-color: #F5F1ED;   /* 淡米色背景 */
-    --text-color: #4A4A4A;         /* 深灰色文字 */
-    --accent-color: #A67B5B;       /* 溫暖的棕色 */
+    /* 主色調 - 使用更柔和的自然色系 */
+    --primary-color: #D7C4BB;      /* 柔和的玫瑰米色 */
+    --secondary-color: #7D6E5D;    /* 溫暖的灰褐色 */
+    --background-color: #F8F6F4;   /* 淡米色背景 */
+    --text-color: #5C4B51;         /* 深紫灰色文字 */
+    --accent-color: #9B8579;       /* 溫暖的棕灰色 */
     --error-color: #B87A6D;        /* 柔和的紅褐色 */
-    --success-color: #7A9D7E;      /* 柔和的綠灰色 */
+    --success-color: #8B9D7E;      /* 柔和的綠灰色 */
     
     /* 陰影和邊框 */
-    --shadow-color: rgba(0, 0, 0, 0.1);
-    --border-color: #D4C4B7;       /* 柔和的邊框色 */
+    --shadow-color: rgba(0, 0, 0, 0.08);
+    --border-color: #E5DCD5;       /* 柔和的邊框色 */
     --border-radius: 8px;
     --spacing: 1rem;
     --transition: all 0.3s ease;
@@ -366,12 +366,12 @@ tr:hover {
 @media (prefers-color-scheme: dark) {
     :root {
         --primary-color: #4A4A4A;
-        --secondary-color: #8B7355;
+        --secondary-color: #7D6E5D;
         --background-color: #2C2C2C;
-        --text-color: #E6D5C7;
-        --accent-color: #A67B5B;
+        --text-color: #E5DCD5;
+        --accent-color: #9B8579;
         --error-color: #B87A6D;
-        --success-color: #7A9D7E;
+        --success-color: #8B9D7E;
         --border-color: #4A4A4A;
     }
 
@@ -408,4 +408,10 @@ tr:hover {
 
 .page-header h2 {
     margin: 0;
+}
+
+/* 標題樣式 */
+h1, h2, h3 {
+    color: var(--secondary-color);
+    margin-bottom: 1rem;
 } 
