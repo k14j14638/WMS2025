@@ -353,14 +353,19 @@ async function updateInventoryTable() {
             tr.innerHTML = `
                 <td>${product.id}</td>
                 <td>${product.name}</td>
+                <td>${product.specification}</td>
                 <td>${product.stock}</td>
                 <td>${product.minStock}</td>
                 <td>${status}</td>
+                <td>
+                    <button class="btn primary" onclick="editInventory('${product.id}')">編輯</button>
+                    <button class="btn danger" onclick="deleteInventory('${product.id}')">刪除</button>
+                </td>
             `;
             tbody.appendChild(tr);
         });
     } catch (error) {
-        console.error('更新庫存表格時出錯：', error);
+        console.error('更新庫存表格時出錯:', error);
     }
 }
 
@@ -862,6 +867,130 @@ async function clearAllData() {
     }
 }
 
+// 編輯庫存
+async function editInventory(id) {
+    try {
+        const productDoc = await db.collection(PRODUCTS).where('id', '==', id).get();
+        const product = productDoc.docs[0].data();
+        
+        const modalBody = document.getElementById('modal-body');
+        modalBody.innerHTML = `
+            <h3>編輯商品</h3>
+            <form id="edit-inventory-form">
+                <div class="form-group">
+                    <label for="product-id">商品編號</label>
+                    <input type="text" id="product-id" value="${product.id}" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="product-name">商品名稱</label>
+                    <input type="text" id="product-name" value="${product.name}" required>
+                </div>
+                <div class="form-group">
+                    <label for="product-spec">規格</label>
+                    <input type="text" id="product-spec" value="${product.specification}" required>
+                </div>
+                <div class="form-group">
+                    <label for="product-stock">當前庫存</label>
+                    <input type="number" id="product-stock" value="${product.stock}" required min="0">
+                </div>
+                <div class="form-group">
+                    <label for="product-min">最低庫存</label>
+                    <input type="number" id="product-min" value="${product.minStock}" required min="0">
+                </div>
+                <button type="submit" class="btn primary">保存</button>
+            </form>
+        `;
+        
+        document.getElementById('modal').style.display = 'block';
+        
+        document.getElementById('edit-inventory-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const updatedProduct = {
+                id: document.getElementById('product-id').value,
+                name: document.getElementById('product-name').value,
+                specification: document.getElementById('product-spec').value,
+                stock: parseInt(document.getElementById('product-stock').value),
+                minStock: parseInt(document.getElementById('product-min').value)
+            };
+            
+            await db.collection(PRODUCTS).doc(productDoc.docs[0].id).update(updatedProduct);
+            
+            closeModal();
+            updateInventoryTable();
+            updateDashboard();
+        });
+    } catch (error) {
+        console.error('編輯庫存時出錯:', error);
+    }
+}
+
+// 刪除庫存
+async function deleteInventory(id) {
+    if (confirm('確定要刪除此商品嗎？')) {
+        try {
+            const productDoc = await db.collection(PRODUCTS).where('id', '==', id).get();
+            await db.collection(PRODUCTS).doc(productDoc.docs[0].id).delete();
+            
+            updateInventoryTable();
+            updateDashboard();
+        } catch (error) {
+            console.error('刪除庫存時出錯:', error);
+        }
+    }
+}
+
+// 新增商品
+function addInventory() {
+    const modalBody = document.getElementById('modal-body');
+    modalBody.innerHTML = `
+        <h3>新增商品</h3>
+        <form id="add-inventory-form">
+            <div class="form-group">
+                <label for="product-id">商品編號</label>
+                <input type="text" id="product-id" required>
+            </div>
+            <div class="form-group">
+                <label for="product-name">商品名稱</label>
+                <input type="text" id="product-name" required>
+            </div>
+            <div class="form-group">
+                <label for="product-spec">規格</label>
+                <input type="text" id="product-spec" required>
+            </div>
+            <div class="form-group">
+                <label for="product-stock">初始庫存</label>
+                <input type="number" id="product-stock" required min="0">
+            </div>
+            <div class="form-group">
+                <label for="product-min">最低庫存</label>
+                <input type="number" id="product-min" required min="0">
+            </div>
+            <button type="submit" class="btn primary">保存</button>
+        </form>
+    `;
+    
+    document.getElementById('modal').style.display = 'block';
+    
+    document.getElementById('add-inventory-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const product = {
+            id: document.getElementById('product-id').value,
+            name: document.getElementById('product-name').value,
+            specification: document.getElementById('product-spec').value,
+            stock: parseInt(document.getElementById('product-stock').value),
+            minStock: parseInt(document.getElementById('product-min').value)
+        };
+        
+        await db.collection(PRODUCTS).doc(product.id).set(product);
+        
+        closeModal();
+        updateInventoryTable();
+        updateDashboard();
+    });
+}
+
 // 初始化
 document.addEventListener('DOMContentLoaded', () => {
     initializeData();
@@ -874,6 +1003,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // 設置模態框關閉按鈕
     document.querySelector('.close').addEventListener('click', closeModal);
+    
+    // 新增商品按鈕
+    document.getElementById('add-inventory-btn').addEventListener('click', addInventory);
     
     // 初始化儀表板
     updateDashboard();
