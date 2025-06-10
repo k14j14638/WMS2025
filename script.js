@@ -250,17 +250,26 @@ async function initializeSampleOutbound() {
     }
 }
 
-// 頁面導航
+// 設置導航
 function setupNavigation() {
-    const navLinks = document.querySelectorAll('nav a');
+    const navLinks = document.querySelectorAll('.nav a');
+    const sections = document.querySelectorAll('section');
+
     navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
-            const targetPage = link.getAttribute('data-page');
-            showPage(targetPage);
+            const targetId = link.getAttribute('href').substring(1);
             
-            navLinks.forEach(l => l.classList.remove('active'));
-            link.classList.add('active');
+            // 隱藏所有區塊
+            sections.forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            // 顯示目標區塊
+            const targetSection = document.getElementById(targetId);
+            if (targetSection) {
+                targetSection.style.display = 'block';
+            }
         });
     });
 }
@@ -1377,7 +1386,10 @@ function setupButtonListeners() {
     const addProductBtn = document.getElementById('addProductBtn');
     if (addProductBtn) {
         addProductBtn.addEventListener('click', () => {
-            document.getElementById('addProductModal').style.display = 'block';
+            const modal = document.getElementById('addProductModal');
+            if (modal) {
+                modal.style.display = 'block';
+            }
         });
     }
 
@@ -1385,7 +1397,10 @@ function setupButtonListeners() {
     const addInboundBtn = document.getElementById('addInboundBtn');
     if (addInboundBtn) {
         addInboundBtn.addEventListener('click', () => {
-            document.getElementById('addInboundModal').style.display = 'block';
+            const modal = document.getElementById('addInboundModal');
+            if (modal) {
+                modal.style.display = 'block';
+            }
         });
     }
 
@@ -1393,7 +1408,10 @@ function setupButtonListeners() {
     const addOutboundBtn = document.getElementById('addOutboundBtn');
     if (addOutboundBtn) {
         addOutboundBtn.addEventListener('click', () => {
-            document.getElementById('addOutboundModal').style.display = 'block';
+            const modal = document.getElementById('addOutboundModal');
+            if (modal) {
+                modal.style.display = 'block';
+            }
         });
     }
 
@@ -1412,9 +1430,27 @@ function setupButtonListeners() {
     if (addOutboundForm) {
         addOutboundForm.addEventListener('submit', addOutbound);
     }
+
+    // 關閉按鈕
+    const closeButtons = document.querySelectorAll('.close');
+    closeButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const modal = button.closest('.modal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        });
+    });
+
+    // 點擊模態框外部關閉
+    window.addEventListener('click', (e) => {
+        if (e.target.classList.contains('modal')) {
+            e.target.style.display = 'none';
+        }
+    });
 }
 
-// 在頁面加載時設置事件監聽器
+// 在頁面加載時初始化
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         // 測試資料庫連接
@@ -1436,6 +1472,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         // 更新自動完成選項
         await updateAutocompleteOptions();
 
+        // 設置導航
+        setupNavigation();
+
         // 更新頁面顯示
         await updateProductsTable();
         await updateInboundTable();
@@ -1445,6 +1484,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // 設置按鈕事件監聽器
         setupButtonListeners();
+
+        // 默認顯示儀表板
+        const sections = document.querySelectorAll('section');
+        sections.forEach(section => {
+            section.style.display = 'none';
+        });
+        const dashboard = document.getElementById('dashboard');
+        if (dashboard) {
+            dashboard.style.display = 'block';
+        }
 
         console.log('系統初始化完成！');
     } catch (error) {
