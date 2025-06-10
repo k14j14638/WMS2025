@@ -1,12 +1,17 @@
 /* 全局樣式 */
 :root {
-    --primary-color: #9B8579;
-    --secondary-color: #D5C3AA;
-    --background-color: #F5F1E8;
-    --text-color: #4A4A4A;
-    --accent-color: #7D6E63;
-    --error-color: #B56576;
-    --success-color: #6B8F71;
+    /* 主色調 - 使用柔和的米色和灰褐色 */
+    --primary-color: #E6D5C7;      /* 柔和的米色 */
+    --secondary-color: #8B7355;    /* 溫暖的灰褐色 */
+    --background-color: #F5F1ED;   /* 淡米色背景 */
+    --text-color: #4A4A4A;         /* 深灰色文字 */
+    --accent-color: #A67B5B;       /* 溫暖的棕色 */
+    --error-color: #B87A6D;        /* 柔和的紅褐色 */
+    --success-color: #7A9D7E;      /* 柔和的綠灰色 */
+    
+    /* 陰影和邊框 */
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --border-color: #D4C4B7;       /* 柔和的邊框色 */
     --border-radius: 8px;
     --spacing: 1rem;
     --transition: all 0.3s ease;
@@ -25,7 +30,7 @@ html {
 }
 
 body {
-    font-family: 'Microsoft JhengHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Noto Sans TC', sans-serif;
     line-height: 1.6;
     background-color: var(--background-color);
     color: var(--text-color);
@@ -37,8 +42,7 @@ body {
 .container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: var(--spacing);
-    width: 100%;
+    padding: 20px;
 }
 
 /* 頭部樣式 */
@@ -63,25 +67,30 @@ header h1 {
 }
 
 /* 導航樣式 */
+nav {
+    background-color: var(--primary-color);
+    padding: 1rem;
+    margin-bottom: 2rem;
+}
+
 nav ul {
     list-style: none;
+    padding: 0;
+    margin: 0;
     display: flex;
-    gap: var(--spacing);
-    flex-wrap: wrap;
+    gap: 1rem;
 }
 
 nav a {
-    text-decoration: none;
     color: var(--text-color);
+    text-decoration: none;
     padding: 0.5rem 1rem;
-    border-radius: var(--border-radius);
-    transition: var(--transition);
-    font-size: 0.9rem;
-    white-space: nowrap;
+    border-radius: 4px;
+    transition: all 0.3s ease;
 }
 
-nav a:hover, nav a.active {
-    background-color: var(--primary-color);
+nav a:hover {
+    background-color: var(--secondary-color);
     color: white;
 }
 
@@ -113,12 +122,14 @@ main {
 }
 
 .card {
-    background-color: rgba(255, 255, 255, 0.7);
-    padding: var(--spacing);
-    border-radius: var(--border-radius);
+    background-color: white;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px var(--shadow-color);
     text-align: center;
     transition: var(--transition);
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--border-color);
 }
 
 .card:hover {
@@ -144,59 +155,60 @@ main {
     margin-top: var(--spacing);
     -webkit-overflow-scrolling: touch;
     border-radius: var(--border-radius);
-    background-color: rgba(255, 255, 255, 0.7);
+    background-color: white;
+    box-shadow: 0 2px 4px var(--shadow-color);
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 0.5rem;
+    margin: 20px 0;
+    background-color: white;
+    box-shadow: 0 2px 4px var(--shadow-color);
     font-size: 0.9rem;
 }
 
 th, td {
-    padding: 0.75rem;
+    padding: 12px;
     text-align: left;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid var(--border-color);
 }
 
 th {
-    background-color: rgba(155, 133, 121, 0.1);
+    background-color: var(--primary-color);
+    color: var(--text-color);
     font-weight: 500;
-    color: var(--primary-color);
 }
 
 tr:hover {
-    background-color: rgba(155, 133, 121, 0.05);
+    background-color: var(--background-color);
 }
 
 /* 按鈕樣式 */
 .btn {
-    padding: 0.5rem 1rem;
+    padding: 8px 16px;
     border: none;
-    border-radius: var(--border-radius);
+    border-radius: 4px;
     cursor: pointer;
-    font-size: 0.9rem;
-    transition: var(--transition);
+    font-size: 14px;
+    transition: all 0.3s ease;
     background-color: var(--primary-color);
-    color: white;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
+    color: var(--text-color);
 }
 
 .btn:hover {
-    opacity: 0.9;
-    transform: translateY(-1px);
+    background-color: var(--secondary-color);
+    color: white;
 }
 
 .btn.primary {
-    background-color: var(--primary-color);
+    background-color: var(--accent-color);
+    color: white;
 }
 
 .btn.danger {
     background-color: var(--error-color);
+    color: white;
 }
 
 /* 操作欄 */
@@ -243,12 +255,11 @@ tr:hover {
 }
 
 .modal-content {
-    background-color: var(--background-color);
-    margin: 5% auto;
-    padding: var(--spacing);
-    width: 90%;
+    background-color: white;
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 8px;
     max-width: 500px;
-    border-radius: var(--border-radius);
     position: relative;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     animation: slideIn 0.3s ease;
@@ -256,16 +267,11 @@ tr:hover {
 
 .close {
     position: absolute;
-    right: var(--spacing);
-    top: var(--spacing);
-    font-size: 1.5rem;
+    right: 20px;
+    top: 10px;
+    font-size: 24px;
     cursor: pointer;
     color: var(--text-color);
-    transition: var(--transition);
-}
-
-.close:hover {
-    color: var(--error-color);
 }
 
 /* 表單樣式 */
@@ -277,25 +283,22 @@ tr:hover {
     display: block;
     margin-bottom: 0.5rem;
     color: var(--text-color);
-    font-size: 0.9rem;
 }
 
 .form-group input,
 .form-group select {
     width: 100%;
-    padding: 0.75rem;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    border-radius: var(--border-radius);
-    font-size: 0.9rem;
-    background-color: rgba(255, 255, 255, 0.9);
-    transition: var(--transition);
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: white;
+    color: var(--text-color);
 }
 
 .form-group input:focus,
 .form-group select:focus {
     outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(155, 133, 121, 0.2);
+    border-color: var(--accent-color);
 }
 
 /* 動畫 */
@@ -317,7 +320,6 @@ tr:hover {
 
     nav ul {
         flex-direction: column;
-        gap: 0.5rem;
     }
 
     .dashboard-grid {
@@ -329,8 +331,8 @@ tr:hover {
     }
 
     .modal-content {
-        width: 95%;
-        margin: 10% auto;
+        margin: 20% auto;
+        width: 90%;
     }
 
     .table-container {
@@ -363,11 +365,14 @@ tr:hover {
 /* 深色模式支持 */
 @media (prefers-color-scheme: dark) {
     :root {
+        --primary-color: #4A4A4A;
+        --secondary-color: #8B7355;
         --background-color: #2C2C2C;
-        --text-color: #E0E0E0;
-        --primary-color: #B8A99A;
-        --secondary-color: #8B7D6E;
-        --accent-color: #A89B8F;
+        --text-color: #E6D5C7;
+        --accent-color: #A67B5B;
+        --error-color: #B87A6D;
+        --success-color: #7A9D7E;
+        --border-color: #4A4A4A;
     }
 
     .card,
@@ -382,5 +387,13 @@ tr:hover {
     .form-group select {
         background-color: rgba(60, 60, 60, 0.9);
         color: var(--text-color);
+    }
+
+    table {
+        background-color: #333;
+    }
+
+    th {
+        background-color: #4A4A4A;
     }
 } 
