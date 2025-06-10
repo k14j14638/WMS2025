@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>倉庫管理系統</title>
+    <title>東基專案材料管理系統</title>
     <link rel="stylesheet" href="styles.css">
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <!-- 添加 SheetJS 庫 -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -16,7 +18,6 @@
             <nav>
                 <ul>
                     <li><a href="#" class="active" data-page="dashboard">儀表板</a></li>
-                    <li><a href="#" data-page="products">商品管理</a></li>
                     <li><a href="#" data-page="inventory">庫存管理</a></li>
                     <li><a href="#" data-page="inbound">入庫管理</a></li>
                     <li><a href="#" data-page="outbound">出庫管理</a></li>
@@ -49,40 +50,23 @@
                 </div>
             </section>
 
-            <!-- 商品管理頁面 -->
-            <section id="products" class="page">
-                <h2>商品管理</h2>
-                <div class="action-bar">
-                    <button id="add-product-btn" class="btn primary">新增商品</button>
-                </div>
-                <div class="table-container">
-                    <table id="products-table">
-                        <thead>
-                            <tr>
-                                <th>商品編號</th>
-                                <th>商品名稱</th>
-                                <th>規格</th>
-                                <th>庫存</th>
-                                <th>操作</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-            </section>
-
             <!-- 庫存管理頁面 -->
             <section id="inventory" class="page">
                 <h2>庫存管理</h2>
+                <div class="action-bar">
+                    <button id="add-inventory-btn" class="btn primary">新增商品</button>
+                </div>
                 <div class="table-container">
                     <table id="inventory-table">
                         <thead>
                             <tr>
                                 <th>商品編號</th>
                                 <th>商品名稱</th>
+                                <th>規格</th>
                                 <th>當前庫存</th>
                                 <th>最低庫存</th>
                                 <th>狀態</th>
+                                <th>操作</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -145,6 +129,25 @@
                     <div class="report-card">
                         <h3>出入庫趨勢</h3>
                         <canvas id="trend-chart"></canvas>
+                    </div>
+                    <div class="report-card">
+                        <h3>出入庫紀錄</h3>
+                        <button id="export-excel-btn" class="btn primary">匯出EXCEL</button>
+                        <div class="table-container">
+                            <table id="records-table">
+                                <thead>
+                                    <tr>
+                                        <th>日期</th>
+                                        <th>類型</th>
+                                        <th>商品編號</th>
+                                        <th>商品名稱</th>
+                                        <th>數量</th>
+                                        <th>操作者</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </section>

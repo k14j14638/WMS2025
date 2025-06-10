@@ -991,6 +991,138 @@ function addInventory() {
     });
 }
 
+// 匯出 Excel 功能
+async function exportToExcel() {
+    try {
+        // 獲取所有出入庫記錄
+        const inboundSnapshot = await db.collection(INBOUND).get();
+        const outboundSnapshot = await db.collection(OUTBOUND).get();
+        
+        // 合併並格式化數據
+        const records = [];
+        
+        // 處理入庫記錄
+        inboundSnapshot.forEach(doc => {
+            const data = doc.data();
+            records.push({
+                日期: data.date,
+                類型: '入庫',
+                商品編號: data.productId,
+                商品名稱: data.productName,
+                數量: data.quantity,
+                操作者: data.operator
+            });
+        });
+        
+        // 處理出庫記錄
+        outboundSnapshot.forEach(doc => {
+            const data = doc.data();
+            records.push({
+                日期: data.date,
+                類型: '出庫',
+                商品編號: data.productId,
+                商品名稱: data.productName,
+                數量: data.quantity,
+                操作者: data.operator
+            });
+        });
+        
+        // 按日期排序（新到舊）
+        records.sort((a, b) => new Date(b.日期) - new Date(a.日期));
+        
+        // 創建工作簿
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.json_to_sheet(records);
+        
+        // 設置列寬
+        const colWidths = [
+            { wch: 20 }, // 日期
+            { wch: 10 }, // 類型
+            { wch: 15 }, // 商品編號
+            { wch: 20 }, // 商品名稱
+            { wch: 10 }, // 數量
+            { wch: 15 }  // 操作者
+        ];
+        ws['!cols'] = colWidths;
+        
+        // 添加工作表到工作簿
+        XLSX.utils.book_append_sheet(wb, ws, "出入庫紀錄");
+        
+        // 生成文件名（使用當前日期）
+        const fileName = `出入庫紀錄_${new Date().toISOString().split('T')[0]}.xlsx`;
+        
+        // 導出文件
+        XLSX.writeFile(wb, fileName);
+        
+    } catch (error) {
+        console.error('匯出 Excel 時出錯:', error);
+        alert('匯出失敗，請稍後再試');
+    }
+}
+
+// 更新報表頁面
+async function updateReportsPage() {
+    try {
+        // 獲取所有出入庫記錄
+        const inboundSnapshot = await db.collection(INBOUND).get();
+        const outboundSnapshot = await db.collection(OUTBOUND).get();
+        
+        // 合併記錄
+        const records = [];
+        
+        inboundSnapshot.forEach(doc => {
+            const data = doc.data();
+            records.push({
+                日期: data.date,
+                類型: '入庫',
+                商品編號: data.productId,
+                商品名稱: data.productName,
+                數量: data.quantity,
+                操作者: data.operator
+            });
+        });
+        
+        outboundSnapshot.forEach(doc => {
+            const data = doc.data();
+            records.push({
+                日期: data.date,
+                類型: '出庫',
+                商品編號: data.productId,
+                商品名稱: data.productName,
+                數量: data.quantity,
+                操作者: data.operator
+            });
+        });
+        
+        // 按日期排序（新到舊）
+        records.sort((a, b) => new Date(b.日期) - new Date(a.日期));
+        
+        // 更新表格
+        const tbody = document.querySelector('#records-table tbody');
+        tbody.innerHTML = '';
+        
+        records.forEach(record => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${record.日期}</td>
+                <td>${record.類型}</td>
+                <td>${record.商品編號}</td>
+                <td>${record.商品名稱}</td>
+                <td>${record.數量}</td>
+                <td>${record.操作者}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+        
+        // 更新圖表
+        updateInventoryChart();
+        updateTrendChart();
+        
+    } catch (error) {
+        console.error('更新報表頁面時出錯:', error);
+    }
+}
+
 // 初始化
 document.addEventListener('DOMContentLoaded', () => {
     initializeData();
@@ -1006,6 +1138,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // 新增商品按鈕
     document.getElementById('add-inventory-btn').addEventListener('click', addInventory);
+    
+    // 匯出 Excel 按鈕
+    document.getElementById('export-excel-btn').addEventListener('click', exportToExcel);
     
     // 初始化儀表板
     updateDashboard();
