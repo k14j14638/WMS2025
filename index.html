@@ -14,7 +14,7 @@
 <body>
     <div class="container">
         <header>
-            <h1>倉庫管理系統</h1>
+            <h1>東基專案材料管理系統</h1>
             <nav>
                 <ul>
                     <li><a href="#" class="active" data-page="dashboard">儀表板</a></li>
@@ -119,38 +119,20 @@
             </section>
 
             <!-- 報表頁面 -->
-            <section id="reports" class="page">
-                <h2>報表</h2>
-                <div class="reports-container">
-                    <div class="report-card">
-                        <h3>庫存概況</h3>
-                        <canvas id="inventory-chart"></canvas>
-                    </div>
-                    <div class="report-card">
-                        <h3>出入庫趨勢</h3>
-                        <canvas id="trend-chart"></canvas>
-                    </div>
-                    <div class="report-card">
-                        <h3>出入庫紀錄</h3>
-                        <button id="export-excel-btn" class="btn primary">匯出EXCEL</button>
-                        <div class="table-container">
-                            <table id="records-table">
-                                <thead>
-                                    <tr>
-                                        <th>日期</th>
-                                        <th>類型</th>
-                                        <th>商品編號</th>
-                                        <th>商品名稱</th>
-                                        <th>數量</th>
-                                        <th>操作者</th>
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
-                        </div>
-                    </div>
+            <div id="reports-page" class="page">
+                <div class="page-header">
+                    <h2>報表</h2>
+                    <button id="export-excel-btn" class="btn primary">匯出EXCEL</button>
                 </div>
-            </section>
+                <div class="card">
+                    <h3>庫存概況</h3>
+                    <canvas id="inventory-chart"></canvas>
+                </div>
+                <div class="card">
+                    <h3>出入庫趨勢</h3>
+                    <canvas id="trend-chart"></canvas>
+                </div>
+            </div>
         </main>
     </div>
 

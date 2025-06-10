@@ -396,4 +396,16 @@ tr:hover {
     th {
         background-color: #4A4A4A;
     }
+}
+
+/* 頁面標題區域 */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.page-header h2 {
+    margin: 0;
 } 
