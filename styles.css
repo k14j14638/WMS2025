@@ -1,17 +1,17 @@
 /* 全局樣式 */
 :root {
     /* 主色調 - 暗色系 */
-    --primary-color: #2C3E50;      /* 深藍灰色 */
-    --secondary-color: #34495E;    /* 深灰藍色 */
-    --background-color: #1A1A1A;   /* 深灰色背景 */
-    --text-color: #ECF0F1;         /* 淺灰色文字 */
-    --accent-color: #3498DB;       /* 亮藍色 */
-    --error-color: #E74C3C;        /* 紅色 */
-    --success-color: #2ECC71;      /* 綠色 */
+    --primary-color: #E8D5C4;    /* 淺米色 */
+    --secondary-color: #3A4D39;  /* 深橄欖綠 */
+    --background-color: #FAF6F1; /* 淺米白 */
+    --text-color: #2C3639;      /* 深灰 */
+    --accent-color: #7D6E5D;    /* 暖棕色 */
+    --error-color: #B87A6D;     /* 暗紅 */
+    --success-color: #8B9D7E;   /* 暗綠 */
     
     /* 陰影和邊框 */
-    --shadow-color: rgba(0, 0, 0, 0.3);
-    --border-color: #2C3E50;       /* 深藍灰色邊框 */
+    --shadow-color: rgba(0, 0, 0, 0.08);
+    --border-color: #E8D5C4;
     --border-radius: 8px;
     --spacing: 1rem;
     --transition: all 0.3s ease;
@@ -91,7 +91,7 @@ nav a {
 
 nav a:hover {
     background-color: var(--accent-color);
-    color: white;
+    color: var(--background-color);
 }
 
 /* 主要內容區域 */
@@ -163,7 +163,7 @@ table {
     width: 100%;
     border-collapse: collapse;
     margin: 20px 0;
-    background-color: var(--secondary-color);
+    background-color: var(--background-color);
     box-shadow: 0 2px 4px var(--shadow-color);
     font-size: 0.9rem;
 }
@@ -193,23 +193,32 @@ tr:hover {
     cursor: pointer;
     font-size: 14px;
     transition: all 0.3s ease;
-    background-color: var(--secondary-color);
+    background-color: var(--primary-color);
     color: var(--text-color);
 }
 
 .btn:hover {
     background-color: var(--accent-color);
-    color: white;
+    color: var(--background-color);
 }
 
-.btn.primary {
+.btn-primary {
+    background-color: var(--secondary-color);
+    color: var(--background-color);
+}
+
+.btn-primary:hover {
     background-color: var(--accent-color);
-    color: white;
 }
 
-.btn.danger {
-    background-color: var(--error-color);
-    color: white;
+.btn-secondary {
+    background-color: var(--primary-color);
+    color: var(--text-color);
+}
+
+.btn-secondary:hover {
+    background-color: var(--accent-color);
+    color: var(--background-color);
 }
 
 /* 操作欄 */
@@ -249,16 +258,18 @@ tr:hover {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
 }
 
 .modal-content {
-    background-color: var(--secondary-color);
+    background-color: var(--background-color);
     margin: 10% auto;
     padding: 20px;
     border-radius: 8px;
+    width: 80%;
     max-width: 500px;
-    position: relative;
+    box-shadow: 0 4px 6px var(--shadow-color);
 }
 
 .close {
@@ -272,12 +283,12 @@ tr:hover {
 
 /* 表單樣式 */
 .form-group {
-    margin-bottom: 1rem;
+    margin-bottom: 15px;
 }
 
 .form-group label {
     display: block;
-    margin-bottom: 0.5rem;
+    margin-bottom: 5px;
     color: var(--text-color);
 }
 
@@ -287,7 +298,7 @@ tr:hover {
     padding: 8px;
     border: 1px solid var(--border-color);
     border-radius: 4px;
-    background-color: var(--secondary-color);
+    background-color: var(--background-color);
     color: var(--text-color);
 }
 
@@ -327,8 +338,8 @@ tr:hover {
     }
 
     .modal-content {
-        margin: 20% auto;
-        width: 90%;
+        width: 95%;
+        margin: 5% auto;
     }
 
     .table-container {
@@ -344,6 +355,15 @@ tr:hover {
 
     .btn {
         width: 100%;
+    }
+
+    .nav {
+        padding: 10px;
+    }
+    
+    .nav a {
+        display: block;
+        margin: 5px 0;
     }
 }
 
@@ -410,4 +430,56 @@ tr:hover {
 h1, h2, h3 {
     color: var(--text-color);
     margin-bottom: 1rem;
+}
+
+/* 導航欄樣式 */
+.nav {
+    background-color: var(--primary-color);
+    padding: 10px 20px;
+    box-shadow: 0 2px 4px var(--shadow-color);
+}
+
+.nav a {
+    color: var(--text-color);
+    text-decoration: none;
+    padding: 8px 16px;
+    margin-right: 10px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.nav a:hover {
+    background-color: var(--accent-color);
+    color: var(--background-color);
+}
+
+/* 儀表板卡片樣式 */
+.dashboard-card {
+    background-color: var(--background-color);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px var(--shadow-color);
+    margin-bottom: 20px;
+}
+
+.dashboard-card h3 {
+    color: var(--text-color);
+    margin-top: 0;
+}
+
+/* 錯誤和成功消息樣式 */
+.error {
+    color: var(--error-color);
+    background-color: rgba(184, 122, 109, 0.1);
+    padding: 10px;
+    border-radius: 4px;
+    margin: 10px 0;
+}
+
+.success {
+    color: var(--success-color);
+    background-color: rgba(139, 157, 126, 0.1);
+    padding: 10px;
+    border-radius: 4px;
+    margin: 10px 0;
 } 

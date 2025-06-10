@@ -67,6 +67,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         await updateProductsTable();
         await updateInventoryTable();
         await updateInboundTable();
+        await updateOutboundTable();
+        await updateReports();
         alert('系統初始化完成！請查看控制台獲取詳細信息。');
     } else {
         alert('數據庫連接測試失敗！請查看控制台獲取錯誤信息。');
@@ -1337,7 +1339,50 @@ async function updateProductSelects() {
     }
 }
 
-// 在適當的時機調用更新函數
+// 設置按鈕事件監聽器
+function setupButtonListeners() {
+    // 新增商品按鈕
+    const addProductBtn = document.getElementById('addProductBtn');
+    if (addProductBtn) {
+        addProductBtn.addEventListener('click', () => {
+            document.getElementById('addProductModal').style.display = 'block';
+        });
+    }
+
+    // 新增入庫按鈕
+    const addInboundBtn = document.getElementById('addInboundBtn');
+    if (addInboundBtn) {
+        addInboundBtn.addEventListener('click', () => {
+            document.getElementById('addInboundModal').style.display = 'block';
+        });
+    }
+
+    // 新增出庫按鈕
+    const addOutboundBtn = document.getElementById('addOutboundBtn');
+    if (addOutboundBtn) {
+        addOutboundBtn.addEventListener('click', () => {
+            document.getElementById('addOutboundModal').style.display = 'block';
+        });
+    }
+
+    // 表單提交事件
+    const addProductForm = document.getElementById('addProductForm');
+    if (addProductForm) {
+        addProductForm.addEventListener('submit', addProduct);
+    }
+
+    const addInboundForm = document.getElementById('addInboundForm');
+    if (addInboundForm) {
+        addInboundForm.addEventListener('submit', addInbound);
+    }
+
+    const addOutboundForm = document.getElementById('addOutboundForm');
+    if (addOutboundForm) {
+        addOutboundForm.addEventListener('submit', addOutbound);
+    }
+}
+
+// 在頁面加載時設置事件監聽器
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         // 測試資料庫連接
@@ -1372,119 +1417,4 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('初始化時發生錯誤:', error);
         alert('初始化失敗，請檢查控制台獲取詳細信息');
     }
-});
-
-// 在相關操作後更新自動完成選項
-async function addProduct(event) {
-    event.preventDefault();
-    try {
-        const formData = new FormData(event.target);
-        const productData = {
-            id: formData.get('productId'),
-            name: formData.get('productName'),
-            stock: parseInt(formData.get('productStock')),
-            location: formData.get('productLocation'),
-            category: formData.get('productCategory')
-        };
-
-        await addDoc(PRODUCTS, productData);
-        closeModal('addProductModal');
-        event.target.reset();
-        updateInventoryTable();
-        updateDashboard();
-        updateReportCharts();
-        await updateAutocompleteOptions(); // 更新自動完成選項
-    } catch (error) {
-        console.error('新增商品時發生錯誤:', error);
-        alert('新增商品失敗');
-    }
-}
-
-async function addInbound(event) {
-    event.preventDefault();
-    try {
-        const formData = new FormData(event.target);
-        const inboundData = {
-            productId: formData.get('productId'),
-            quantity: parseInt(formData.get('quantity')),
-            date: formData.get('date')
-        };
-
-        await addDoc(INBOUND, inboundData);
-        await updateProductStock(inboundData.productId, inboundData.quantity);
-        closeModal('addInboundModal');
-        event.target.reset();
-        updateInboundTable();
-        updateInventoryTable();
-        updateDashboard();
-        updateReportCharts();
-        await updateAutocompleteOptions();
-    } catch (error) {
-        console.error('新增入庫時發生錯誤:', error);
-        alert('新增入庫失敗');
-    }
-}
-
-async function addOutbound(event) {
-    event.preventDefault();
-    try {
-        const formData = new FormData(event.target);
-        const outboundData = {
-            productId: formData.get('productId'),
-            quantity: parseInt(formData.get('quantity')),
-            date: formData.get('date')
-        };
-
-        await addDoc(OUTBOUND, outboundData);
-        await updateProductStock(outboundData.productId, -outboundData.quantity);
-        closeModal('addOutboundModal');
-        event.target.reset();
-        updateOutboundTable();
-        updateInventoryTable();
-        updateDashboard();
-        updateReportCharts();
-        await updateAutocompleteOptions();
-    } catch (error) {
-        console.error('新增出庫時發生錯誤:', error);
-        alert('新增出庫失敗');
-    }
-}
-
-// 設置事件監聽器
-document.addEventListener('DOMContentLoaded', () => {
-    // 測試數據庫連接
-    testDatabaseConnection();
-    
-    // 設置導航
-    setupNavigation();
-    
-    // 設置模態框關閉按鈕
-    document.querySelector('.close').addEventListener('click', closeModal);
-    
-    // 新增商品按鈕
-    const addInventoryBtn = document.getElementById('add-inventory-btn');
-    if (addInventoryBtn) {
-        addInventoryBtn.addEventListener('click', addInventory);
-    }
-    
-    // 新增入庫按鈕
-    const addInboundBtn = document.getElementById('add-inbound-btn');
-    if (addInboundBtn) {
-        addInboundBtn.addEventListener('click', addInbound);
-    }
-    
-    // 新增出庫按鈕
-    const addOutboundBtn = document.getElementById('add-outbound-btn');
-    if (addOutboundBtn) {
-        addOutboundBtn.addEventListener('click', addOutbound);
-    }
-    
-    // 匯出 Excel 按鈕
-    const exportExcelBtn = document.getElementById('export-excel-btn');
-    if (exportExcelBtn) {
-        exportExcelBtn.addEventListener('click', exportToExcel);
-    }
-    
-    // 初始化儀表板
-    updateDashboard();
 }); 
