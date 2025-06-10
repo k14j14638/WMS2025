@@ -37,16 +37,6 @@ const PRODUCTS = 'products';
 const INBOUND = 'inbound';
 const OUTBOUND = 'outbound';
 
-// 啟用離線持久化
-db.enablePersistence()
-    .catch((err) => {
-        if (err.code === 'failed-precondition') {
-            console.log('多個標籤頁打開時無法啟用離線持久化');
-        } else if (err.code === 'unimplemented') {
-            console.log('當前瀏覽器不支持離線持久化');
-        }
-    });
-
 // 測試數據庫連接
 async function testDatabaseConnection() {
     try {
