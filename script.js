@@ -62,9 +62,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         await clearAllData();
         // 然後初始化示例數據
         await initializeSampleProducts();
+        await initializeSampleInbound();
         await updateDashboard();
         await updateProductsTable();
         await updateInventoryTable();
+        await updateInboundTable();
         alert('系統初始化完成！請查看控制台獲取詳細信息。');
     } else {
         alert('數據庫連接測試失敗！請查看控制台獲取錯誤信息。');
@@ -159,6 +161,68 @@ async function initializeSampleProducts() {
         }
     } catch (error) {
         console.error('初始化示例商品數據時出錯:', error);
+    }
+}
+
+// 初始化示例入庫記錄
+async function initializeSampleInbound() {
+    try {
+        const inboundSnapshot = await db.collection(INBOUND).get();
+        if (inboundSnapshot.empty) {
+            console.log('開始添加示例入庫記錄...');
+            const today = new Date().toISOString().split('T')[0];
+            const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+            
+            const sampleInbound = [
+                {
+                    id: 'IN001',
+                    productId: 'P001',
+                    productName: '筆記型電腦',
+                    quantity: 10,
+                    date: today,
+                    operator: '系統管理員'
+                },
+                {
+                    id: 'IN002',
+                    productId: 'P002',
+                    productName: '無線滑鼠',
+                    quantity: 20,
+                    date: today,
+                    operator: '系統管理員'
+                },
+                {
+                    id: 'IN003',
+                    productId: 'P003',
+                    productName: '機械鍵盤',
+                    quantity: 5,
+                    date: yesterday,
+                    operator: '系統管理員'
+                }
+            ];
+
+            // 批量添加示例數據
+            const batch = db.batch();
+            sampleInbound.forEach(record => {
+                const docRef = db.collection(INBOUND).doc(record.id);
+                batch.set(docRef, record);
+            });
+            await batch.commit();
+            console.log('示例入庫記錄初始化成功！');
+
+            // 更新商品庫存
+            for (const record of sampleInbound) {
+                const productDoc = await db.collection(PRODUCTS).where('id', '==', record.productId).get();
+                if (!productDoc.empty) {
+                    const currentProduct = productDoc.docs[0].data();
+                    await db.collection(PRODUCTS).doc(productDoc.docs[0].id).update({
+                        stock: currentProduct.stock + record.quantity
+                    });
+                }
+            }
+            console.log('商品庫存更新完成！');
+        }
+    } catch (error) {
+        console.error('初始化示例入庫記錄時出錯:', error);
     }
 }
 
