@@ -13,13 +13,24 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
+// 啟用離線持久化
+db.enablePersistence()
+    .catch((err) => {
+        if (err.code === 'failed-precondition') {
+            console.log('多個標籤頁打開時無法啟用離線持久化');
+        } else if (err.code === 'unimplemented') {
+            console.log('當前瀏覽器不支持離線持久化');
+        }
+    });
+
 // 測試數據庫連接
 async function testDatabaseConnection() {
     try {
         // 嘗試添加一個測試文檔
         const testDoc = {
             timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-            message: '測試連接成功'
+            message: '測試連接成功',
+            environment: window.location.hostname === 'k14j14638.github.io' ? 'production' : 'development'
         };
         
         await db.collection('test').add(testDoc);
