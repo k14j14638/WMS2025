@@ -76,10 +76,53 @@ async function testDatabaseConnection() {
     }
 }
 
-// 在頁面加載時執行初始化
+// 顯示指定頁面
+function showPage(pageId) {
+    // 隱藏所有頁面
+    document.querySelectorAll('section.page').forEach(section => {
+        section.style.display = 'none';
+    });
+    
+    // 顯示目標頁面
+    const targetPage = document.getElementById(pageId);
+    if (targetPage) {
+        targetPage.style.display = 'block';
+    }
+    
+    // 更新導航狀態
+    document.querySelectorAll('nav a').forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === '#' + pageId) {
+            link.classList.add('active');
+        }
+    });
+}
+
+// 處理頁面導航
+function handleNavigation() {
+    // 從 URL hash 獲取頁面 ID，如果沒有則默認為 dashboard
+    const pageId = window.location.hash.substring(1) || 'dashboard';
+    showPage(pageId);
+}
+
+// 設置導航
+function setupNavigation() {
+    // 監聽 hash 變化
+    window.addEventListener('hashchange', handleNavigation);
+    
+    // 初始加載時處理導航
+    handleNavigation();
+}
+
+// 在頁面加載時初始化
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         console.log('開始系統初始化...');
+
+        // 設置導航
+        console.log('設置導航...');
+        setupNavigation();
+        console.log('導航設置完成');
 
         // 測試資料庫連接
         console.log('測試資料庫連接...');
@@ -109,11 +152,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         await updateAutocompleteOptions();
         console.log('自動完成選項更新完成');
 
-        // 設置導航
-        console.log('設置導航...');
-        setupNavigation();
-        console.log('導航設置完成');
-
         // 更新頁面顯示
         console.log('更新頁面顯示...');
         await updateProductsTable();
@@ -127,18 +165,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log('設置按鈕事件監聽器...');
         setupButtonListeners();
         console.log('按鈕事件監聽器設置完成');
-
-        // 默認顯示儀表板
-        console.log('設置默認顯示...');
-        const sections = document.querySelectorAll('section');
-        sections.forEach(section => {
-            section.style.display = 'none';
-        });
-        const dashboard = document.getElementById('dashboard');
-        if (dashboard) {
-            dashboard.style.display = 'block';
-        }
-        console.log('默認顯示設置完成');
 
         console.log('系統初始化完成！');
     } catch (error) {
@@ -344,90 +370,6 @@ async function initializeSampleOutbound() {
     } catch (error) {
         console.error('初始化示例出庫記錄時出錯:', error);
         throw error;
-    }
-}
-
-// 設置導航
-function setupNavigation() {
-    const navLinks = document.querySelectorAll('nav a');
-    const sections = document.querySelectorAll('section.page');
-    
-    // 處理導航點擊
-    navLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            const targetId = link.getAttribute('href').substring(1);
-            
-            // 隱藏所有區塊
-            sections.forEach(section => {
-                section.style.display = 'none';
-            });
-            
-            // 顯示目標區塊
-            const targetSection = document.getElementById(targetId);
-            if (targetSection) {
-                targetSection.style.display = 'block';
-                // 更新 URL hash
-                window.location.hash = targetId;
-                
-                // 更新活動狀態
-                navLinks.forEach(navLink => {
-                    navLink.classList.remove('active');
-                });
-                link.classList.add('active');
-            }
-        });
-    });
-    
-    // 處理初始加載時的 hash
-    const initialHash = window.location.hash.substring(1) || 'dashboard';
-    sections.forEach(section => {
-        section.style.display = section.id === initialHash ? 'block' : 'none';
-    });
-    
-    // 設置初始活動狀態
-    const initialLink = document.querySelector(`nav a[href="#${initialHash}"]`);
-    if (initialLink) {
-        initialLink.classList.add('active');
-    }
-}
-
-// 顯示指定頁面
-function showPage(pageId) {
-    const pages = document.querySelectorAll('.page');
-    pages.forEach(page => {
-        page.classList.remove('active');
-    });
-    document.getElementById(pageId).classList.add('active');
-    
-    updatePageData(pageId);
-}
-
-// 更新頁面數據
-async function updatePageData(pageId) {
-    try {
-        switch (pageId) {
-            case 'dashboard':
-                await updateDashboard();
-                break;
-            case 'products':
-                await updateProductsTable();
-                break;
-            case 'inventory':
-                await updateInventoryTable();
-                break;
-            case 'inbound':
-                await updateInboundTable();
-                break;
-            case 'outbound':
-                await updateOutboundTable();
-                break;
-            case 'reports':
-                await updateReports();
-                break;
-        }
-    } catch (error) {
-        console.error('更新頁面數據時出錯：', error);
     }
 }
 
