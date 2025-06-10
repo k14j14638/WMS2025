@@ -1,17 +1,41 @@
+// 導入 Firebase 和 Firestore 函數
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+import { 
+    getFirestore, 
+    collection, 
+    doc, 
+    getDoc, 
+    getDocs, 
+    addDoc, 
+    updateDoc, 
+    deleteDoc, 
+    setDoc,
+    writeBatch,
+    query,
+    where,
+    orderBy,
+    limit,
+    serverTimestamp 
+} from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
 // Firebase 配置
 const firebaseConfig = {
-    apiKey: "AIzaSyA5icRnFMGbWxNRba_I2nYek5Wn55AoxR4",
-    authDomain: "wms2025-bc1d1.firebaseapp.com",
-    projectId: "wms2025-bc1d1",
-    storageBucket: "wms2025-bc1d1.firebasestorage.app",
-    messagingSenderId: "823862095197",
-    appId: "1:823862095197:web:c0ca94c9748f0b171b0cb4",
-    measurementId: "G-VHJ8BXN4VW"
+    apiKey: "AIzaSyDxQxQxQxQxQxQxQxQxQxQxQxQxQxQxQxQ",
+    authDomain: "wms2025-xxxxx.firebaseapp.com",
+    projectId: "wms2025-xxxxx",
+    storageBucket: "wms2025-xxxxx.appspot.com",
+    messagingSenderId: "xxxxxxxxxxxx",
+    appId: "1:xxxxxxxxxxxx:web:xxxxxxxxxxxxxxxxxxxx"
 };
 
 // 初始化 Firebase
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// 定義集合名稱
+const PRODUCTS = 'products';
+const INBOUND = 'inbound';
+const OUTBOUND = 'outbound';
 
 // 啟用離線持久化
 db.enablePersistence()
@@ -28,7 +52,7 @@ async function testDatabaseConnection() {
     try {
         // 嘗試添加一個測試文檔
         const testDoc = {
-            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            timestamp: serverTimestamp(),
             message: '測試連接成功',
             environment: window.location.hostname === 'k14j14638.github.io' ? 'production' : 'development'
         };
@@ -128,11 +152,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-// 集合名稱
-const PRODUCTS = 'products';
-const INBOUND = 'inbound';
-const OUTBOUND = 'outbound';
-
 // 初始化數據
 async function initializeData() {
     try {
@@ -157,9 +176,9 @@ async function initializeData() {
             ];
 
             // 批量添加示例數據
-            const batch = db.batch();
+            const batch = writeBatch(db);
             sampleProducts.forEach(product => {
-                const docRef = db.collection(PRODUCTS).doc(product.id);
+                const docRef = doc(db, PRODUCTS, product.id);
                 batch.set(docRef, product);
             });
             await batch.commit();
@@ -204,9 +223,9 @@ async function initializeSampleProducts() {
             }
         ];
 
-        const batch = db.batch();
+        const batch = writeBatch(db);
         products.forEach(product => {
-            const docRef = db.collection(PRODUCTS).doc(product.id);
+            const docRef = doc(db, PRODUCTS, product.id);
             batch.set(docRef, product);
         });
         await batch.commit();
@@ -232,7 +251,7 @@ async function updateProductStock(productId, quantity) {
         const newStock = currentStock + quantity;
 
         // 更新庫存
-        await db.collection(PRODUCTS).doc(productDoc.id).update({
+        await updateDoc(doc(db, PRODUCTS, productDoc.id), {
             stock: newStock
         });
 
@@ -269,9 +288,9 @@ async function initializeSampleInbound() {
             }
         ];
 
-        const batch = db.batch();
+        const batch = writeBatch(db);
         inboundRecords.forEach(record => {
-            const docRef = db.collection(INBOUND).doc(record.id);
+            const docRef = doc(db, INBOUND, record.id);
             batch.set(docRef, record);
         });
         await batch.commit();
@@ -309,9 +328,9 @@ async function initializeSampleOutbound() {
             }
         ];
 
-        const batch = db.batch();
+        const batch = writeBatch(db);
         outboundRecords.forEach(record => {
-            const docRef = db.collection(OUTBOUND).doc(record.id);
+            const docRef = doc(db, OUTBOUND, record.id);
             batch.set(docRef, record);
         });
         await batch.commit();
@@ -1526,420 +1545,4 @@ function setupButtonListeners() {
             e.target.style.display = 'none';
         }
     });
-}
-
-// 更新報表頁面
-async function updateReportsPage() {
-    try {
-        // 獲取所有出入庫記錄
-        const inboundSnapshot = await db.collection(INBOUND).get();
-        const outboundSnapshot = await db.collection(OUTBOUND).get();
-        
-        // 合併記錄
-        const records = [];
-        
-        inboundSnapshot.forEach(doc => {
-            const data = doc.data();
-            records.push({
-                日期: data.date,
-                類型: '入庫',
-                商品編號: data.productId,
-                商品名稱: data.productName,
-                數量: data.quantity,
-                操作者: data.operator
-            });
-        });
-        
-        outboundSnapshot.forEach(doc => {
-            const data = doc.data();
-            records.push({
-                日期: data.date,
-                類型: '出庫',
-                商品編號: data.productId,
-                商品名稱: data.productName,
-                數量: data.quantity,
-                操作者: data.operator
-            });
-        });
-        
-        // 按日期排序（新到舊）
-        records.sort((a, b) => new Date(b.日期) - new Date(a.日期));
-        
-        // 更新表格
-        const tbody = document.querySelector('#records-table tbody');
-        tbody.innerHTML = '';
-        
-        records.forEach(record => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${record.日期}</td>
-                <td>${record.類型}</td>
-                <td>${record.商品編號}</td>
-                <td>${record.商品名稱}</td>
-                <td>${record.數量}</td>
-                <td>${record.操作者}</td>
-            `;
-            tbody.appendChild(tr);
-        });
-        
-        // 更新圖表
-        updateInventoryChart();
-        updateTrendChart();
-        
-    } catch (error) {
-        console.error('更新報表頁面時出錯:', error);
-    }
-}
-
-// 載入商品選項
-async function loadProductOptions(selectId) {
-    try {
-        const select = document.getElementById(selectId);
-        const productsSnapshot = await db.collection(PRODUCTS).get();
-        
-        productsSnapshot.forEach(doc => {
-            const product = doc.data();
-            const option = document.createElement('option');
-            option.value = product.id;
-            option.textContent = `${product.name} (${product.id})`;
-            select.appendChild(option);
-        });
-    } catch (error) {
-        console.error('載入商品選項時出錯:', error);
-    }
-}
-
-// 更新庫存圖表
-async function updateInventoryChart() {
-    try {
-        const productsSnapshot = await db.collection(PRODUCTS).get();
-        const ctx = document.getElementById('inventory-chart').getContext('2d');
-        
-        const labels = [];
-        const stockData = [];
-        const minStockData = [];
-        
-        productsSnapshot.forEach(doc => {
-            const product = doc.data();
-            labels.push(product.name);
-            stockData.push(product.stock);
-            minStockData.push(product.minStock);
-        });
-        
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [
-                    {
-                        label: '當前庫存',
-                        data: stockData,
-                        backgroundColor: 'rgba(155, 133, 121, 0.5)',
-                        borderColor: 'rgba(155, 133, 121, 1)',
-                        borderWidth: 1
-                    },
-                    {
-                        label: '最低庫存',
-                        data: minStockData,
-                        backgroundColor: 'rgba(107, 143, 113, 0.5)',
-                        borderColor: 'rgba(107, 143, 113, 1)',
-                        borderWidth: 1
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-    } catch (error) {
-        console.error('更新庫存圖表時出錯:', error);
-    }
-}
-
-// 更新趨勢圖表
-async function updateTrendChart() {
-    try {
-        const inboundSnapshot = await db.collection(INBOUND).get();
-        const outboundSnapshot = await db.collection(OUTBOUND).get();
-        
-        const dates = new Set();
-        const inboundData = {};
-        const outboundData = {};
-        
-        // 收集所有日期
-        inboundSnapshot.forEach(doc => {
-            const data = doc.data();
-            dates.add(data.date);
-            inboundData[data.date] = (inboundData[data.date] || 0) + data.quantity;
-        });
-        
-        outboundSnapshot.forEach(doc => {
-            const data = doc.data();
-            dates.add(data.date);
-            outboundData[data.date] = (outboundData[data.date] || 0) + data.quantity;
-        });
-        
-        // 轉換為數組並排序
-        const sortedDates = Array.from(dates).sort();
-        
-        const ctx = document.getElementById('trend-chart').getContext('2d');
-        
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: sortedDates,
-                datasets: [
-                    {
-                        label: '入庫數量',
-                        data: sortedDates.map(date => inboundData[date] || 0),
-                        borderColor: 'rgba(155, 133, 121, 1)',
-                        backgroundColor: 'rgba(155, 133, 121, 0.1)',
-                        fill: true
-                    },
-                    {
-                        label: '出庫數量',
-                        data: sortedDates.map(date => outboundData[date] || 0),
-                        borderColor: 'rgba(107, 143, 113, 1)',
-                        backgroundColor: 'rgba(107, 143, 113, 0.1)',
-                        fill: true
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-    } catch (error) {
-        console.error('更新趨勢圖表時出錯:', error);
-    }
-}
-
-// 更新自動完成選項
-async function updateAutocompleteOptions() {
-    try {
-        const productsSnapshot = await db.collection(PRODUCTS).get();
-        const productIds = new Set();
-        const productNames = new Set();
-        const locations = new Set();
-        const categories = new Set();
-
-        // 收集商品相關選項
-        productsSnapshot.forEach(doc => {
-            const data = doc.data();
-            productIds.add(data.id);
-            productNames.add(data.name);
-            locations.add(data.location);
-            categories.add(data.category);
-        });
-
-        // 更新 datalist 選項
-        updateDatalist('existingProductIds', Array.from(productIds));
-        updateDatalist('existingProductNames', Array.from(productNames));
-        updateDatalist('existingLocations', Array.from(locations));
-        updateDatalist('existingCategories', Array.from(categories));
-
-        // 更新商品選擇下拉選單
-        updateProductSelects();
-    } catch (error) {
-        console.error('更新自動完成選項時發生錯誤:', error);
-    }
-}
-
-// 更新 datalist 選項
-function updateDatalist(id, options) {
-    const datalist = document.getElementById(id);
-    if (datalist) {
-        datalist.innerHTML = options.map(option => 
-            `<option value="${option}">`
-        ).join('');
-    }
-}
-
-// 更新商品選擇下拉選單
-async function updateProductSelects() {
-    try {
-        const productsSnapshot = await db.collection(PRODUCTS).get();
-        const products = [];
-        productsSnapshot.forEach(doc => {
-            const data = doc.data();
-            products.push({
-                id: data.id,
-                name: data.name
-            });
-        });
-
-        // 更新入庫和出庫表單的商品選擇
-        const inboundSelect = document.getElementById('inboundProductId');
-        const outboundSelect = document.getElementById('outboundProductId');
-
-        if (inboundSelect) {
-            inboundSelect.innerHTML = products.map(product => 
-                `<option value="${product.id}">${product.id} - ${product.name}</option>`
-            ).join('');
-        }
-
-        if (outboundSelect) {
-            outboundSelect.innerHTML = products.map(product => 
-                `<option value="${product.id}">${product.id} - ${product.name}</option>`
-            ).join('');
-        }
-    } catch (error) {
-        console.error('更新商品選擇時發生錯誤:', error);
-    }
-}
-
-// 設置按鈕事件監聽器
-function setupButtonListeners() {
-    // 新增商品按鈕
-    const addProductBtn = document.getElementById('addProductBtn');
-    if (addProductBtn) {
-        addProductBtn.addEventListener('click', () => {
-            const modal = document.getElementById('addProductModal');
-            if (modal) {
-                modal.style.display = 'block';
-            }
-        });
-    }
-
-    // 新增入庫按鈕
-    const addInboundBtn = document.getElementById('addInboundBtn');
-    if (addInboundBtn) {
-        addInboundBtn.addEventListener('click', () => {
-            const modal = document.getElementById('addInboundModal');
-            if (modal) {
-                modal.style.display = 'block';
-            }
-        });
-    }
-
-    // 新增出庫按鈕
-    const addOutboundBtn = document.getElementById('addOutboundBtn');
-    if (addOutboundBtn) {
-        addOutboundBtn.addEventListener('click', () => {
-            const modal = document.getElementById('addOutboundModal');
-            if (modal) {
-                modal.style.display = 'block';
-            }
-        });
-    }
-
-    // 表單提交事件
-    const addProductForm = document.getElementById('addProductForm');
-    if (addProductForm) {
-        addProductForm.addEventListener('submit', addProduct);
-    }
-
-    const addInboundForm = document.getElementById('addInboundForm');
-    if (addInboundForm) {
-        addInboundForm.addEventListener('submit', addInbound);
-    }
-
-    const addOutboundForm = document.getElementById('addOutboundForm');
-    if (addOutboundForm) {
-        addOutboundForm.addEventListener('submit', addOutbound);
-    }
-
-    // 關閉按鈕
-    const closeButtons = document.querySelectorAll('.close');
-    closeButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const modal = button.closest('.modal');
-            if (modal) {
-                modal.style.display = 'none';
-            }
-        });
-    });
-
-    // 點擊模態框外部關閉
-    window.addEventListener('click', (e) => {
-        if (e.target.classList.contains('modal')) {
-            e.target.style.display = 'none';
-        }
-    });
-}
-
-// 在頁面加載時初始化
-document.addEventListener('DOMContentLoaded', async () => {
-    try {
-        console.log('開始系統初始化...');
-
-        // 測試資料庫連接
-        console.log('測試資料庫連接...');
-        const testDoc = doc(db, 'test', 'test');
-        await setDoc(testDoc, { test: true });
-        await deleteDoc(testDoc);
-        console.log('資料庫連接測試成功');
-
-        // 清除現有數據
-        console.log('開始清除現有數據...');
-        await clearAllData();
-        console.log('數據清除完成');
-
-        // 初始化示例數據
-        console.log('開始初始化示例數據...');
-        await initializeSampleProducts();
-        console.log('示例商品初始化完成');
-
-        await initializeSampleInbound();
-        console.log('示例入庫記錄初始化完成');
-
-        await initializeSampleOutbound();
-        console.log('示例出庫記錄初始化完成');
-
-        // 更新自動完成選項
-        console.log('更新自動完成選項...');
-        await updateAutocompleteOptions();
-        console.log('自動完成選項更新完成');
-
-        // 設置導航
-        console.log('設置導航...');
-        setupNavigation();
-        console.log('導航設置完成');
-
-        // 更新頁面顯示
-        console.log('更新頁面顯示...');
-        await updateProductsTable();
-        await updateInboundTable();
-        await updateOutboundTable();
-        await updateDashboard();
-        await updateReportCharts();
-        console.log('頁面顯示更新完成');
-
-        // 設置按鈕事件監聽器
-        console.log('設置按鈕事件監聽器...');
-        setupButtonListeners();
-        console.log('按鈕事件監聽器設置完成');
-
-        // 默認顯示儀表板
-        console.log('設置默認顯示...');
-        const sections = document.querySelectorAll('section');
-        sections.forEach(section => {
-            section.style.display = 'none';
-        });
-        const dashboard = document.getElementById('dashboard');
-        if (dashboard) {
-            dashboard.style.display = 'block';
-        }
-        console.log('默認顯示設置完成');
-
-        console.log('系統初始化完成！');
-    } catch (error) {
-        console.error('初始化時發生錯誤:', error);
-        console.error('錯誤詳情:', {
-            message: error.message,
-            stack: error.stack,
-            name: error.name
-        });
-        alert('初始化失敗，請檢查控制台獲取詳細信息');
-    }
-}); 
+} 
