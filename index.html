@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>倉庫管理系統</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>倉庫管理系統</h1>
+            <nav>
+                <ul>
+                    <li><a href="#" class="active" data-page="dashboard">儀表板</a></li>
+                    <li><a href="#" data-page="products">商品管理</a></li>
+                    <li><a href="#" data-page="inventory">庫存管理</a></li>
+                    <li><a href="#" data-page="inbound">入庫管理</a></li>
+                    <li><a href="#" data-page="outbound">出庫管理</a></li>
+                    <li><a href="#" data-page="reports">報表</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+            <!-- 儀表板頁面 -->
+            <section id="dashboard" class="page active">
+                <h2>儀表板</h2>
+                <div class="dashboard-grid">
+                    <div class="card">
+                        <h3>總商品數</h3>
+                        <p id="total-products">0</p>
+                    </div>
+                    <div class="card">
+                        <h3>庫存警告</h3>
+                        <p id="low-stock">0</p>
+                    </div>
+                    <div class="card">
+                        <h3>今日入庫</h3>
+                        <p id="today-inbound">0</p>
+                    </div>
+                    <div class="card">
+                        <h3>今日出庫</h3>
+                        <p id="today-outbound">0</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 商品管理頁面 -->
+            <section id="products" class="page">
+                <h2>商品管理</h2>
+                <div class="action-bar">
+                    <button id="add-product-btn" class="btn primary">新增商品</button>
+                </div>
+                <div class="table-container">
+                    <table id="products-table">
+                        <thead>
+                            <tr>
+                                <th>商品編號</th>
+                                <th>商品名稱</th>
+                                <th>規格</th>
+                                <th>庫存</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 庫存管理頁面 -->
+            <section id="inventory" class="page">
+                <h2>庫存管理</h2>
+                <div class="table-container">
+                    <table id="inventory-table">
+                        <thead>
+                            <tr>
+                                <th>商品編號</th>
+                                <th>商品名稱</th>
+                                <th>當前庫存</th>
+                                <th>最低庫存</th>
+                                <th>狀態</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 入庫管理頁面 -->
+            <section id="inbound" class="page">
+                <h2>入庫管理</h2>
+                <div class="action-bar">
+                    <button id="add-inbound-btn" class="btn primary">新增入庫</button>
+                </div>
+                <div class="table-container">
+                    <table id="inbound-table">
+                        <thead>
+                            <tr>
+                                <th>入庫單號</th>
+                                <th>商品名稱</th>
+                                <th>數量</th>
+                                <th>日期</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 出庫管理頁面 -->
+            <section id="outbound" class="page">
+                <h2>出庫管理</h2>
+                <div class="action-bar">
+                    <button id="add-outbound-btn" class="btn primary">新增出庫</button>
+                </div>
+                <div class="table-container">
+                    <table id="outbound-table">
+                        <thead>
+                            <tr>
+                                <th>出庫單號</th>
+                                <th>商品名稱</th>
+                                <th>數量</th>
+                                <th>日期</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 報表頁面 -->
+            <section id="reports" class="page">
+                <h2>報表</h2>
+                <div class="reports-container">
+                    <div class="report-card">
+                        <h3>庫存概況</h3>
+                        <canvas id="inventory-chart"></canvas>
+                    </div>
+                    <div class="report-card">
+                        <h3>出入庫趨勢</h3>
+                        <canvas id="trend-chart"></canvas>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- 模態框 -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+</body>
+</html> 
