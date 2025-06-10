@@ -349,9 +349,9 @@ async function initializeSampleOutbound() {
 
 // 設置導航
 function setupNavigation() {
-    const navLinks = document.querySelectorAll('.nav a');
+    const navLinks = document.querySelectorAll('nav a');
     const sections = document.querySelectorAll('section');
-
+    
     navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
@@ -367,7 +367,16 @@ function setupNavigation() {
             if (targetSection) {
                 targetSection.style.display = 'block';
             }
+            
+            // 更新 URL hash
+            window.location.hash = targetId;
         });
+    });
+    
+    // 處理初始加載時的 hash
+    const initialHash = window.location.hash.substring(1) || 'dashboard';
+    sections.forEach(section => {
+        section.style.display = section.id === initialHash ? 'block' : 'none';
     });
 }
 
@@ -1211,8 +1220,8 @@ async function exportToExcel() {
 async function updateReportsPage() {
     try {
         // 獲取所有出入庫記錄
-        const inboundSnapshot = await db.collection(INBOUND).get();
-        const outboundSnapshot = await db.collection(OUTBOUND).get();
+        const inboundSnapshot = await getDocs(collection(db, INBOUND));
+        const outboundSnapshot = await getDocs(collection(db, OUTBOUND));
         
         // 合併記錄
         const records = [];
@@ -1224,8 +1233,7 @@ async function updateReportsPage() {
                 類型: '入庫',
                 商品編號: data.productId,
                 商品名稱: data.productName,
-                數量: data.quantity,
-                操作者: data.operator
+                數量: data.quantity
             });
         });
         
@@ -1236,8 +1244,7 @@ async function updateReportsPage() {
                 類型: '出庫',
                 商品編號: data.productId,
                 商品名稱: data.productName,
-                數量: data.quantity,
-                操作者: data.operator
+                數量: data.quantity
             });
         });
         
@@ -1246,24 +1253,24 @@ async function updateReportsPage() {
         
         // 更新表格
         const tbody = document.querySelector('#records-table tbody');
-        tbody.innerHTML = '';
-        
-        records.forEach(record => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${record.日期}</td>
-                <td>${record.類型}</td>
-                <td>${record.商品編號}</td>
-                <td>${record.商品名稱}</td>
-                <td>${record.數量}</td>
-                <td>${record.操作者}</td>
-            `;
-            tbody.appendChild(tr);
-        });
+        if (tbody) {
+            tbody.innerHTML = '';
+            records.forEach(record => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${record.日期}</td>
+                    <td>${record.類型}</td>
+                    <td>${record.商品編號}</td>
+                    <td>${record.商品名稱}</td>
+                    <td>${record.數量}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
         
         // 更新圖表
-        updateInventoryChart();
-        updateTrendChart();
+        await updateInventoryChart();
+        await updateTrendChart();
         
     } catch (error) {
         console.error('更新報表頁面時出錯:', error);
@@ -1291,8 +1298,9 @@ async function loadProductOptions(selectId) {
 // 更新庫存圖表
 async function updateInventoryChart() {
     try {
-        const productsSnapshot = await db.collection(PRODUCTS).get();
-        const ctx = document.getElementById('inventory-chart').getContext('2d');
+        const productsSnapshot = await getDocs(collection(db, PRODUCTS));
+        const ctx = document.getElementById('inventory-chart');
+        if (!ctx) return;
         
         const labels = [];
         const stockData = [];
@@ -1302,10 +1310,10 @@ async function updateInventoryChart() {
             const product = doc.data();
             labels.push(product.name);
             stockData.push(product.stock);
-            minStockData.push(product.minStock);
+            minStockData.push(product.minStock || 0);
         });
         
-        new Chart(ctx, {
+        new Chart(ctx.getContext('2d'), {
             type: 'bar',
             data: {
                 labels: labels,
@@ -1343,8 +1351,8 @@ async function updateInventoryChart() {
 // 更新趨勢圖表
 async function updateTrendChart() {
     try {
-        const inboundSnapshot = await db.collection(INBOUND).get();
-        const outboundSnapshot = await db.collection(OUTBOUND).get();
+        const inboundSnapshot = await getDocs(collection(db, INBOUND));
+        const outboundSnapshot = await getDocs(collection(db, OUTBOUND));
         
         const dates = new Set();
         const inboundData = {};
@@ -1366,9 +1374,10 @@ async function updateTrendChart() {
         // 轉換為數組並排序
         const sortedDates = Array.from(dates).sort();
         
-        const ctx = document.getElementById('trend-chart').getContext('2d');
+        const ctx = document.getElementById('trend-chart');
+        if (!ctx) return;
         
-        new Chart(ctx, {
+        new Chart(ctx.getContext('2d'), {
             type: 'line',
             data: {
                 labels: sortedDates,
