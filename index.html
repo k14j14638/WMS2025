@@ -147,6 +147,93 @@
         </div>
     </div>
 
+    <!-- 新增商品表單 -->
+    <div class="modal" id="addProductModal">
+        <div class="modal-content">
+            <h2>新增商品</h2>
+            <form id="addProductForm">
+                <div class="form-group">
+                    <label for="productId">商品編號</label>
+                    <input type="text" id="productId" name="productId" required list="existingProductIds">
+                    <datalist id="existingProductIds"></datalist>
+                </div>
+                <div class="form-group">
+                    <label for="productName">商品名稱</label>
+                    <input type="text" id="productName" name="productName" required list="existingProductNames">
+                    <datalist id="existingProductNames"></datalist>
+                </div>
+                <div class="form-group">
+                    <label for="productStock">庫存數量</label>
+                    <input type="number" id="productStock" name="productStock" required min="0">
+                </div>
+                <div class="form-group">
+                    <label for="productLocation">存放位置</label>
+                    <input type="text" id="productLocation" name="productLocation" required list="existingLocations">
+                    <datalist id="existingLocations"></datalist>
+                </div>
+                <div class="form-group">
+                    <label for="productCategory">商品類別</label>
+                    <input type="text" id="productCategory" name="productCategory" required list="existingCategories">
+                    <datalist id="existingCategories"></datalist>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">新增</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('addProductModal')">取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 新增入庫表單 -->
+    <div class="modal" id="addInboundModal">
+        <div class="modal-content">
+            <h2>新增入庫</h2>
+            <form id="addInboundForm">
+                <div class="form-group">
+                    <label for="inboundProductId">商品編號</label>
+                    <select id="inboundProductId" name="productId" required></select>
+                </div>
+                <div class="form-group">
+                    <label for="inboundQuantity">數量</label>
+                    <input type="number" id="inboundQuantity" name="quantity" required min="1">
+                </div>
+                <div class="form-group">
+                    <label for="inboundDate">日期</label>
+                    <input type="date" id="inboundDate" name="date" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">新增</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('addInboundModal')">取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 新增出庫表單 -->
+    <div class="modal" id="addOutboundModal">
+        <div class="modal-content">
+            <h2>新增出庫</h2>
+            <form id="addOutboundForm">
+                <div class="form-group">
+                    <label for="outboundProductId">商品編號</label>
+                    <select id="outboundProductId" name="productId" required></select>
+                </div>
+                <div class="form-group">
+                    <label for="outboundQuantity">數量</label>
+                    <input type="number" id="outboundQuantity" name="quantity" required min="1">
+                </div>
+                <div class="form-group">
+                    <label for="outboundDate">日期</label>
+                    <input type="date" id="outboundDate" name="date" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">新增</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('addOutboundModal')">取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html> 
