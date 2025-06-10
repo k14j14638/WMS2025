@@ -52,12 +52,15 @@ async function testDatabaseConnection() {
     }
 }
 
-// 在頁面加載時執行測試
+// 在頁面加載時執行初始化
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('開始測試數據庫連接...');
     const isConnected = await testDatabaseConnection();
     if (isConnected) {
-        console.log('數據庫連接成功，開始初始化示例數據...');
+        console.log('數據庫連接成功，開始初始化數據...');
+        // 先清除所有數據
+        await clearAllData();
+        // 然後初始化示例數據
         await initializeSampleProducts();
         await updateDashboard();
         await updateProductsTable();
@@ -753,6 +756,45 @@ async function deleteOutbound(id) {
             console.error('刪除出庫記錄時出錯：', error);
             alert('刪除出庫記錄失敗，請重試');
         }
+    }
+}
+
+// 清除所有數據
+async function clearAllData() {
+    try {
+        console.log('開始清除所有數據...');
+        
+        // 清除商品數據
+        const productsSnapshot = await db.collection(PRODUCTS).get();
+        const batch = db.batch();
+        productsSnapshot.docs.forEach(doc => {
+            batch.delete(doc.ref);
+        });
+        await batch.commit();
+        console.log('商品數據已清除');
+        
+        // 清除入庫記錄
+        const inboundSnapshot = await db.collection(INBOUND).get();
+        const inboundBatch = db.batch();
+        inboundSnapshot.docs.forEach(doc => {
+            inboundBatch.delete(doc.ref);
+        });
+        await inboundBatch.commit();
+        console.log('入庫記錄已清除');
+        
+        // 清除出庫記錄
+        const outboundSnapshot = await db.collection(OUTBOUND).get();
+        const outboundBatch = db.batch();
+        outboundSnapshot.docs.forEach(doc => {
+            outboundBatch.delete(doc.ref);
+        });
+        await outboundBatch.commit();
+        console.log('出庫記錄已清除');
+        
+        return true;
+    } catch (error) {
+        console.error('清除數據時出錯:', error);
+        return false;
     }
 }
 
