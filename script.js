@@ -1,3 +1,5 @@
+import { writeBatch, collection, doc, getDocs } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js";
+
 // 初始化 Firebase
 let db;
 try {
@@ -197,9 +199,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         // 初始化測試數據
         await initializeTestData();
-        
-        // 設置導航
-        setupNavigation();
         
         // 顯示初始頁面
         const hash = window.location.hash || '#dashboard';
