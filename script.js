@@ -200,6 +200,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         // 初始化測試數據
         await initializeTestData();
         
+        // 新增商品按鈕事件監聽
+        const addInventoryBtn = document.getElementById('add-inventory-btn');
+        if (addInventoryBtn) {
+            addInventoryBtn.addEventListener('click', function() {
+                alert('點擊新增商品！');
+            });
+        }
+        
         // 顯示初始頁面
         const hash = window.location.hash || '#dashboard';
         showPage(hash.substring(1));
