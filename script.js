@@ -231,9 +231,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const data = {
                     id: formData.get('id'),
                     name: formData.get('name'),
+                    spec: formData.get('spec'),
                     stock: Number(formData.get('stock')),
-                    location: formData.get('location'),
-                    category: formData.get('category')
+                    minStock: Number(formData.get('minStock'))
                 };
                 try {
                     await setDoc(doc(collection(db, 'PRODUCTS'), data.id), data);
