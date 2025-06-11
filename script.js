@@ -21,12 +21,14 @@ try {
 function showPage(pageId) {
     // 隱藏所有頁面
     document.querySelectorAll('section.page').forEach(section => {
+        section.classList.remove('active');
         section.style.display = 'none';
     });
     
     // 顯示目標頁面
     const targetPage = document.getElementById(pageId);
     if (targetPage) {
+        targetPage.classList.add('active');
         targetPage.style.display = 'block';
     }
     
