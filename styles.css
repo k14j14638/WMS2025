@@ -103,16 +103,23 @@ main {
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     min-height: 500px;
+    position: relative;
 }
 
+/* 頁面樣式 */
 .page {
     display: none;
     animation: fadeIn 0.3s ease;
     padding: var(--spacing);
+    width: 100%;
+    height: 100%;
+    position: relative;
 }
 
 .page.active {
     display: block !important;
+    opacity: 1;
+    visibility: visible;
 }
 
 /* 儀表板樣式 */
@@ -121,6 +128,7 @@ main {
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: var(--spacing);
     margin-top: var(--spacing);
+    width: 100%;
 }
 
 .card {
@@ -151,7 +159,7 @@ main {
     color: var(--accent-color);
 }
 
-/* 表格樣式 */
+/* 表格容器 */
 .table-container {
     overflow-x: auto;
     margin-top: var(--spacing);
@@ -159,6 +167,7 @@ main {
     border-radius: var(--border-radius);
     background-color: white;
     box-shadow: 0 2px 4px var(--shadow-color);
+    width: 100%;
 }
 
 table {
@@ -168,6 +177,8 @@ table {
     background-color: var(--background-color);
     box-shadow: 0 2px 4px var(--shadow-color);
     font-size: 0.9rem;
+    opacity: 1;
+    visibility: visible;
 }
 
 th, td {
@@ -310,7 +321,7 @@ tr:hover {
     border-color: var(--accent-color);
 }
 
-/* 動畫 */
+/* 動畫效果 */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -490,4 +501,30 @@ h1, h2, h3 {
     padding: 10px;
     border-radius: 4px;
     margin: 10px 0;
+}
+
+/* 確保內容可見 */
+section.page h2,
+section.page .card,
+section.page .table-container,
+section.page .action-bar {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* 修復可能的 z-index 問題 */
+.page.active {
+    z-index: 1;
+}
+
+/* 確保表格內容可見 */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    background-color: var(--background-color);
+    box-shadow: 0 2px 4px var(--shadow-color);
+    font-size: 0.9rem;
+    opacity: 1;
+    visibility: visible;
 } 
