@@ -137,31 +137,11 @@ async function updateDashboard() {
 
 // 頁面導航
 function showPage(pageId) {
-    console.log('顯示頁面:', pageId);
-    
-    // 隱藏所有頁面
-    document.querySelectorAll('section.page').forEach(section => {
-        section.classList.remove('active');
-        section.style.display = 'none';
+    document.querySelectorAll('.page').forEach(page => {
+        page.style.display = 'none';
     });
-    
-    // 顯示目標頁面
-    const targetPage = document.getElementById(pageId);
-    if (targetPage) {
-        console.log('找到目標頁面:', targetPage);
-        targetPage.classList.add('active');
-        targetPage.style.display = 'block';
-    } else {
-        console.error('找不到頁面:', pageId);
-    }
-    
-    // 更新導航狀態
-    document.querySelectorAll('nav a').forEach(link => {
-        link.classList.remove('active');
-        if (link.getAttribute('href') === '#' + pageId) {
-            link.classList.add('active');
-        }
-    });
+    const target = document.getElementById(pageId);
+    if (target) target.style.display = '';
 }
 
 // 處理導航點擊
@@ -209,6 +189,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // 監聽 hash 變化
 window.addEventListener('hashchange', () => {
-    const hash = window.location.hash || '#dashboard';
-    showPage(hash.substring(1));
+    const pageId = location.hash.replace('#', '') || 'dashboard';
+    showPage(pageId);
 }); 
