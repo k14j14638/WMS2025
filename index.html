@@ -17,7 +17,7 @@
             apiKey: "AIzaSyA5icRnFMGbWxNRba_I2nYek5Wn55AoxR4",
             authDomain: "wms2025-bc1d1.firebaseapp.com",
             projectId: "wms2025-bc1d1",
-            storageBucket: "wms2025-bc1d1.firebasestorage.app",
+            storageBucket: "wms2025-bc1d1.appspot.com",
             messagingSenderId: "823862095197",
             appId: "1:823862095197:web:c0ca94c9748f0b171b0cb4",
             measurementId: "G-VHJ8BXN4VW"
@@ -28,9 +28,12 @@
         const analytics = getAnalytics(app);
         const db = getFirestore(app);
 
-        // 將 Firebase 實例添加到 window 對象
-        window.firebaseApp = app;
-        window.firebaseDb = db;
+        // Make Firebase instance available globally
+        window.firebase = {
+            app,
+            analytics,
+            db
+        };
     </script>
     
     <!-- 添加 Chart.js 庫 -->
