@@ -264,3 +264,44 @@ window.addEventListener('hashchange', () => {
 
 // 註解掉自動初始化測試資料
 // await initializeTestData(); 
+
+// 手動建立一筆測試資料
+window.createTestData = async function() {
+    if (!db) {
+        console.error('Firebase 未初始化');
+        return;
+    }
+    try {
+        // 先檢查是否已存在測試商品
+        const testId = 'T001';
+        const productRef = doc(collection(db, 'PRODUCTS'), testId);
+        const productSnap = await getDocs(collection(db, 'PRODUCTS'));
+        if (productSnap.docs.some(d => d.id === testId)) {
+            alert('測試商品已存在，請先刪除再建立！');
+            return;
+        }
+        // 建立商品
+        await setDoc(productRef, {
+            id: testId,
+            name: '測試商品',
+            spec: '標準規格',
+            stock: 100,
+            minStock: 10
+        });
+        // 建立入庫
+        await setDoc(doc(collection(db, 'INBOUND')), {
+            productId: testId,
+            quantity: 50,
+            date: new Date().toISOString()
+        });
+        // 建立出庫
+        await setDoc(doc(collection(db, 'OUTBOUND')), {
+            productId: testId,
+            quantity: 20,
+            date: new Date().toISOString()
+        });
+        alert('測試資料建立完成！');
+    } catch (error) {
+        alert('建立測試資料失敗：' + error.message);
+    }
+} 
