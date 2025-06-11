@@ -1,4 +1,4 @@
-import { writeBatch, collection, doc, getDocs } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js";
+import { writeBatch, collection, doc, getDocs, setDoc } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js";
 
 // 初始化 Firebase
 let db;
@@ -202,9 +202,50 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         // 新增商品按鈕事件監聽
         const addInventoryBtn = document.getElementById('add-inventory-btn');
-        if (addInventoryBtn) {
+        const addProductModal = document.getElementById('add-product-modal');
+        const closeAddProduct = document.getElementById('close-add-product');
+        const cancelAddProduct = document.getElementById('cancel-add-product');
+        const addProductForm = document.getElementById('add-product-form');
+
+        if (addInventoryBtn && addProductModal) {
             addInventoryBtn.addEventListener('click', function() {
-                alert('點擊新增商品！');
+                addProductModal.style.display = 'block';
+            });
+        }
+        if (closeAddProduct && addProductModal) {
+            closeAddProduct.addEventListener('click', function() {
+                addProductModal.style.display = 'none';
+            });
+        }
+        if (cancelAddProduct && addProductModal) {
+            cancelAddProduct.addEventListener('click', function() {
+                addProductModal.style.display = 'none';
+            });
+        }
+        if (addProductForm) {
+            addProductForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const db = window.firebase && window.firebase.db;
+                if (!db) {
+                    alert('Firebase 未初始化');
+                    return;
+                }
+                const formData = new FormData(addProductForm);
+                const data = {
+                    id: formData.get('id'),
+                    name: formData.get('name'),
+                    stock: Number(formData.get('stock')),
+                    location: formData.get('location'),
+                    category: formData.get('category')
+                };
+                try {
+                    await setDoc(doc(collection(db, 'PRODUCTS'), data.id), data);
+                    alert('商品新增成功！');
+                    addProductModal.style.display = 'none';
+                    addProductForm.reset();
+                } catch (error) {
+                    alert('新增失敗：' + error.message);
+                }
             });
         }
         

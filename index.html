@@ -10,7 +10,7 @@
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-app.js";
-        import { getFirestore } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js";
+        import { getFirestore, writeBatch, collection, doc, getDocs } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-analytics.js";
 
         const firebaseConfig = {
@@ -256,6 +256,23 @@
                     <button type="submit" class="btn btn-primary">新增</button>
                     <button type="button" class="btn btn-secondary" onclick="document.getElementById('addOutboundModal').style.display='none'">取消</button>
                 </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 新增商品 Modal -->
+    <div id="add-product-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close" id="close-add-product">&times;</span>
+            <h2>新增商品</h2>
+            <form id="add-product-form">
+                <label>商品編號 <input type="text" name="id" required></label><br>
+                <label>商品名稱 <input type="text" name="name" required></label><br>
+                <label>庫存數量 <input type="number" name="stock" required></label><br>
+                <label>存放位置 <input type="text" name="location"></label><br>
+                <label>商品類別 <input type="text" name="category"></label><br>
+                <button type="submit">新增</button>
+                <button type="button" id="cancel-add-product">取消</button>
             </form>
         </div>
     </div>
