@@ -197,9 +197,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     try {
-        // 初始化測試數據
-        await initializeTestData();
-        
         // 新增商品按鈕事件監聽
         const addInventoryBtn = document.getElementById('add-inventory-btn');
         const addProductModal = document.getElementById('add-product-modal');
@@ -263,4 +260,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 window.addEventListener('hashchange', () => {
     const pageId = location.hash.replace('#', '') || 'dashboard';
     showPage(pageId);
-}); 
+});
+
+// 註解掉自動初始化測試資料
+// await initializeTestData(); 
