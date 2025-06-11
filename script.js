@@ -17,6 +17,12 @@ try {
     // 初始化測試數據
     async function initializeTestData() {
         try {
+            const db = window.firebaseDb;
+            if (!db) {
+                console.error('Firebase 數據庫未初始化');
+                return;
+            }
+
             // 添加測試商品
             const products = [
                 {
@@ -92,6 +98,12 @@ try {
     // 更新庫存顯示
     async function updateInventoryDisplay() {
         try {
+            const db = window.firebaseDb;
+            if (!db) {
+                console.error('Firebase 數據庫未初始化');
+                return;
+            }
+
             const productsSnapshot = await db.collection('products').get();
             const tbody = document.querySelector('#inventory-table tbody');
             tbody.innerHTML = '';
@@ -122,6 +134,12 @@ try {
     // 更新儀表板
     async function updateDashboard() {
         try {
+            const db = window.firebaseDb;
+            if (!db) {
+                console.error('Firebase 數據庫未初始化');
+                return;
+            }
+
             const productsSnapshot = await db.collection('products').get();
             const inboundSnapshot = await db.collection('inbound').get();
             const outboundSnapshot = await db.collection('outbound').get();
@@ -166,7 +184,60 @@ try {
         }
     }
 
-    // 初始化頁面時執行
+    // 頁面導航
+    function showPage(pageId) {
+        console.log('顯示頁面:', pageId);
+        
+        // 隱藏所有頁面
+        document.querySelectorAll('section.page').forEach(section => {
+            section.classList.remove('active');
+            section.style.display = 'none';
+        });
+        
+        // 顯示目標頁面
+        const targetPage = document.getElementById(pageId);
+        if (targetPage) {
+            console.log('找到目標頁面:', targetPage);
+            targetPage.classList.add('active');
+            targetPage.style.display = 'block';
+        } else {
+            console.error('找不到頁面:', pageId);
+        }
+        
+        // 更新導航狀態
+        document.querySelectorAll('nav a').forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === '#' + pageId) {
+                link.classList.add('active');
+            }
+        });
+    }
+
+    // 處理導航點擊
+    function handleNavigation(e) {
+        e.preventDefault();
+        const href = e.target.getAttribute('href');
+        const pageId = href.startsWith('#') ? href.substring(1) : href;
+        console.log('導航到頁面:', pageId);
+        showPage(pageId);
+        window.location.hash = pageId;
+    }
+
+    // 初始化頁面
+    function initializePage() {
+        // 設置導航點擊事件
+        document.querySelectorAll('nav a').forEach(link => {
+            link.addEventListener('click', handleNavigation);
+        });
+        
+        // 顯示初始頁面
+        const hash = window.location.hash;
+        const initialPage = hash ? hash.substring(1) : 'dashboard';
+        console.log('初始頁面:', initialPage);
+        showPage(initialPage);
+    }
+
+    // 當 DOM 加載完成時初始化
     document.addEventListener('DOMContentLoaded', async () => {
         await initializeTestData();
         initializePage();
@@ -174,59 +245,6 @@ try {
 
 } catch (error) {
     console.error('Firebase 初始化失敗:', error);
-}
-
-// 頁面導航
-function showPage(pageId) {
-    console.log('顯示頁面:', pageId);
-    
-    // 隱藏所有頁面
-    document.querySelectorAll('section.page').forEach(section => {
-        section.classList.remove('active');
-        section.style.display = 'none';
-    });
-    
-    // 顯示目標頁面
-    const targetPage = document.getElementById(pageId);
-    if (targetPage) {
-        console.log('找到目標頁面:', targetPage);
-        targetPage.classList.add('active');
-        targetPage.style.display = 'block';
-    } else {
-        console.error('找不到頁面:', pageId);
-    }
-    
-    // 更新導航狀態
-    document.querySelectorAll('nav a').forEach(link => {
-        link.classList.remove('active');
-        if (link.getAttribute('href') === '#' + pageId) {
-            link.classList.add('active');
-        }
-    });
-}
-
-// 處理導航點擊
-function handleNavigation(e) {
-    e.preventDefault();
-    const href = e.target.getAttribute('href');
-    const pageId = href.startsWith('#') ? href.substring(1) : href;
-    console.log('導航到頁面:', pageId);
-    showPage(pageId);
-    window.location.hash = pageId;
-}
-
-// 初始化頁面
-function initializePage() {
-    // 設置導航點擊事件
-    document.querySelectorAll('nav a').forEach(link => {
-        link.addEventListener('click', handleNavigation);
-    });
-    
-    // 顯示初始頁面
-    const hash = window.location.hash;
-    const initialPage = hash ? hash.substring(1) : 'dashboard';
-    console.log('初始頁面:', initialPage);
-    showPage(initialPage);
 }
 
 // 監聽 hash 變化

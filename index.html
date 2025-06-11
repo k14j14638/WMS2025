@@ -6,9 +6,33 @@
     <title>倉庫管理系統</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/WMS2025/styles.css">
+    
     <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-app.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-analytics.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA5icRnFMGbWxNRba_I2nYek5Wn55AoxR4",
+            authDomain: "wms2025-bc1d1.firebaseapp.com",
+            projectId: "wms2025-bc1d1",
+            storageBucket: "wms2025-bc1d1.firebasestorage.app",
+            messagingSenderId: "823862095197",
+            appId: "1:823862095197:web:c0ca94c9748f0b171b0cb4",
+            measurementId: "G-VHJ8BXN4VW"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getFirestore(app);
+
+        // 將 Firebase 實例添加到 window 對象
+        window.firebaseApp = app;
+        window.firebaseDb = db;
+    </script>
+    
     <!-- 添加 Chart.js 庫 -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- 添加 SheetJS 庫 -->
