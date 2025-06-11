@@ -170,6 +170,30 @@ function initializePage() {
 
 // 當 DOM 加載完成時初始化
 document.addEventListener('DOMContentLoaded', async () => {
+    const db = window.firebase && window.firebase.db;
+    if (!db) {
+        console.error('Firebase 未初始化');
+        return;
+    }
+    try {
+        // 讀取 PRODUCTS
+        const productsSnapshot = await getDocs(collection(db, 'PRODUCTS'));
+        const products = productsSnapshot.docs.map(doc => doc.data());
+        console.log('PRODUCTS:', products);
+
+        // 讀取 INBOUND
+        const inboundSnapshot = await getDocs(collection(db, 'INBOUND'));
+        const inbound = inboundSnapshot.docs.map(doc => doc.data());
+        console.log('INBOUND:', inbound);
+
+        // 讀取 OUTBOUND
+        const outboundSnapshot = await getDocs(collection(db, 'OUTBOUND'));
+        const outbound = outboundSnapshot.docs.map(doc => doc.data());
+        console.log('OUTBOUND:', outbound);
+    } catch (error) {
+        console.error('讀取 Firestore 資料失敗:', error);
+    }
+
     try {
         // 初始化測試數據
         await initializeTestData();
