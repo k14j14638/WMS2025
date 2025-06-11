@@ -138,10 +138,10 @@ async function updateDashboard() {
 // 頁面導航
 function showPage(pageId) {
     document.querySelectorAll('.page').forEach(page => {
-        page.style.display = 'none';
+        page.classList.remove('active');
     });
     const target = document.getElementById(pageId);
-    if (target) target.style.display = '';
+    if (target) target.classList.add('active');
 }
 
 // 處理導航點擊
