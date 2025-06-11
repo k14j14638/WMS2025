@@ -87,9 +87,11 @@ async function updateInventoryDisplay() {
             row.innerHTML = `
                 <td>${product.id}</td>
                 <td>${product.name}</td>
+                <td>${product.spec}</td>
                 <td>${product.stock}</td>
-                <td>${product.location}</td>
-                <td>${product.category}</td>
+                <td>${product.minStock}</td>
+                <td>${product.stock <= product.minStock ? '庫存不足' : '正常'}</td>
+                <td></td>
             `;
             tbody.appendChild(row);
         });
@@ -240,6 +242,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     alert('商品新增成功！');
                     addProductModal.style.display = 'none';
                     addProductForm.reset();
+                    await updateInventoryDisplay();
                 } catch (error) {
                     alert('新增失敗：' + error.message);
                 }
